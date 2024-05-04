@@ -1,0 +1,383 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>old footnotes extension - pulldown-cmark guide</title>
+
+
+        <!-- Custom HTML head -->
+        <style>
+            .pulldown-cmark-example {
+                display: flex;
+                gap: 1rem;
+                align-items: stretch;
+            }
+            .pulldown-cmark-example > * {
+                width: 50%;
+            }
+        </style>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">Guide</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../third_party/spec.html"><strong aria-hidden="true">1.</strong> CommonMark specification</a></li><li class="chapter-item expanded "><a href="../third_party/smart_punct.html"><strong aria-hidden="true">2.</strong> CommonMark smart punctuation</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../specs/footnotes.html"><strong aria-hidden="true">3.</strong> footnotes extension</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../specs/old_footnotes.html" class="active"><strong aria-hidden="true">3.1.</strong> old footnotes extension</a></li></ol></li><li class="chapter-item expanded "><a href="../specs/heading_attrs.html"><strong aria-hidden="true">4.</strong> heading attributes</a></li><li class="chapter-item expanded "><a href="../specs/metadata_blocks.html"><strong aria-hidden="true">5.</strong> metadata blocks</a></li><li class="chapter-item expanded "><a href="../specs/strikethrough.html"><strong aria-hidden="true">6.</strong> strikethrough</a></li><li class="chapter-item expanded "><a href="../specs/table.html"><strong aria-hidden="true">7.</strong> table</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../third_party/gfm_strikethrough.html"><strong aria-hidden="true">8.</strong> GitHub strikethrough</a></li><li class="chapter-item expanded "><a href="../third_party/gfm_table.html"><strong aria-hidden="true">9.</strong> GitHub tables</a></li><li class="chapter-item expanded "><a href="../third_party/gfm_tasklist.html"><strong aria-hidden="true">10.</strong> GitHub tasklist</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">pulldown-cmark guide</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <p>Run this with <code>cargo test --features gen-tests suite::footnotes</code>.</p>
+<p>This is how footnotes are basically used.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">Lorem ipsum.[^a]
+
+[^a]: Cool.
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;Lorem ipsum.&lt;sup class="footnote-reference"&gt;&lt;a href="#a"&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;div class="footnote-definition" id="a"&gt;&lt;sup class="footnote-definition-label"&gt;1&lt;/sup&gt;
+&lt;p&gt;Cool.&lt;/p&gt;
+&lt;/div&gt;
+</code></pre>
+</div>
+<p>Footnotes can be used inside blockquotes:</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">&gt; This is the song that never ends.\
+&gt; Yes it goes on and on my friends.[^lambchops]
+&gt;
+&gt; [^lambchops]: &lt;https://www.youtube.com/watch?v=0U2zJOryHKQ&gt;
+</code></pre>
+<pre><code class="language-html">&lt;blockquote&gt;
+&lt;p&gt;This is the song that never ends.&lt;br /&gt;
+Yes it goes on and on my friends.&lt;sup class="footnote-reference"&gt;&lt;a href="#lambchops"&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;div class="footnote-definition" id="lambchops"&gt;&lt;sup class="footnote-definition-label"&gt;1&lt;/sup&gt;
+&lt;p&gt;&lt;a href="https://www.youtube.com/watch?v=0U2zJOryHKQ"&gt;https://www.youtube.com/watch?v=0U2zJOryHKQ&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/blockquote&gt;
+</code></pre>
+</div>
+<p>Footnotes can be complex block structures:</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">Songs that simply loop are a popular way to annoy people. [^examples]
+
+[^examples]:
+ * [The song that never ends](https://www.youtube.com/watch?v=0U2zJOryHKQ)
+ * [I know a song that gets on everybody's nerves](https://www.youtube.com/watch?v=TehWI09qxls)
+ * [Ninety-nine bottles of beer on the wall](https://www.youtube.com/watch?v=qVjCag8XoHQ)
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;Songs that simply loop are a popular way to annoy people. &lt;sup class="footnote-reference"&gt;&lt;a href="#examples"&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;div class="footnote-definition" id="examples"&gt;&lt;sup class="footnote-definition-label"&gt;1&lt;/sup&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://www.youtube.com/watch?v=0U2zJOryHKQ"&gt;The song that never ends&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://www.youtube.com/watch?v=TehWI09qxls"&gt;I know a song that gets on everybody's nerves&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://www.youtube.com/watch?v=qVjCag8XoHQ"&gt;Ninety-nine bottles of beer on the wall&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+</code></pre>
+</div>
+<p>Footnotes can even have multiple paragraphs. They also don't need to be referenced to show up.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">[^lorem]: If heaven ever wishes to grant me a boon, it will be a total effacing of the results of a mere chance which fixed my eye on a certain stray piece of shelf-paper. It was nothing on which I would naturally have stumbled in the course of my daily round, for it was an old number of an Australian journal, the Sydney Bulletin for April 18, 1925. It had escaped even the cutting bureau which had at the time of its issuance been avidly collecting material for my uncle's research.
+
+I had largely given over my inquiries into what Professor Angell called the "Cthulhu Cult", and was visiting a learned friend in Paterson, New Jersey; the curator of a local museum and a mineralogist of note. Examining one day the reserve specimens roughly set on the storage shelves in a rear room of the museum, my eye was caught by an odd picture in one of the old papers spread beneath the stones. It was the Sydney Bulletin I have mentioned, for my friend had wide affiliations in all conceivable foreign parts; and the picture was a half-tone cut of a hideous stone image almost identical with that which Legrasse had found in the swamp.
+</code></pre>
+<pre><code class="language-html">&lt;div class="footnote-definition" id="lorem"&gt;&lt;sup class="footnote-definition-label"&gt;1&lt;/sup&gt;
+&lt;p&gt;If heaven ever wishes to grant me a boon, it will be a total effacing of the results of a mere chance which fixed my eye on a certain stray piece of shelf-paper. It was nothing on which I would naturally have stumbled in the course of my daily round, for it was an old number of an Australian journal, the Sydney Bulletin for April 18, 1925. It had escaped even the cutting bureau which had at the time of its issuance been avidly collecting material for my uncle's research.&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;I had largely given over my inquiries into what Professor Angell called the "Cthulhu Cult", and was visiting a learned friend in Paterson, New Jersey; the curator of a local museum and a mineralogist of note. Examining one day the reserve specimens roughly set on the storage shelves in a rear room of the museum, my eye was caught by an odd picture in one of the old papers spread beneath the stones. It was the Sydney Bulletin I have mentioned, for my friend had wide affiliations in all conceivable foreign parts; and the picture was a half-tone cut of a hideous stone image almost identical with that which Legrasse had found in the swamp.&lt;/p&gt;
+</code></pre>
+</div>
+<p>A footnote will end on a single line break. Note that this behavior changed in version
+0.1.0, to become more like hoedown. See issue #21.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">[^ipsum]: How much wood would a woodchuck chuck.
+
+If a woodchuck could chuck wood.
+
+
+# Forms of entertainment that aren't childish
+</code></pre>
+<pre><code class="language-html">&lt;div class="footnote-definition" id="ipsum"&gt;&lt;sup class="footnote-definition-label"&gt;1&lt;/sup&gt;
+&lt;p&gt;How much wood would a woodchuck chuck.&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;If a woodchuck could chuck wood.&lt;/p&gt;
+&lt;h1&gt;Forms of entertainment that aren't childish&lt;/h1&gt;
+</code></pre>
+</div>
+<p>A footnote will also break if it's inside another container.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">&gt; He's also really stupid. [^why]
+&gt;
+&gt; [^why]: Because your mamma!
+
+As such, we can guarantee that the non-childish forms of entertainment are probably more entertaining to adults, since, having had a whole childhood doing the childish ones, the non-childish ones are merely the ones that haven't gotten boring yet.
+</code></pre>
+<pre><code class="language-html">&lt;blockquote&gt;
+&lt;p&gt;He's also really stupid. &lt;sup class="footnote-reference"&gt;&lt;a href="#why"&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;div class="footnote-definition" id="why"&gt;&lt;sup class="footnote-definition-label"&gt;1&lt;/sup&gt;
+&lt;p&gt;Because your mamma!&lt;/p&gt;
+&lt;/div&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;As such, we can guarantee that the non-childish forms of entertainment are probably more entertaining to adults, since, having had a whole childhood doing the childish ones, the non-childish ones are merely the ones that haven't gotten boring yet.&lt;/p&gt;
+</code></pre>
+</div>
+<p>As a special exception, footnotes cannot be nested directly inside each other.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">Nested footnotes are considered poor style. [^a] [^xkcd]
+
+[^a]: This does not mean that footnotes cannot reference each other. [^b]
+
+[^b]: This means that a footnote definition cannot be directly inside another footnote definition.
+&gt; This means that a footnote cannot be directly inside another footnote's body. [^e]
+&gt;
+&gt; [^e]: They can, however, be inside anything else.
+
+[^xkcd]: [The other kind of nested footnote is, however, considered poor style.](https://xkcd.com/1208/)
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;Nested footnotes are considered poor style. &lt;sup class="footnote-reference"&gt;&lt;a href="#a"&gt;1&lt;/a&gt;&lt;/sup&gt; &lt;sup class="footnote-reference"&gt;&lt;a href="#xkcd"&gt;2&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;div class="footnote-definition" id="a"&gt;&lt;sup class="footnote-definition-label"&gt;1&lt;/sup&gt;
+&lt;p&gt;This does not mean that footnotes cannot reference each other. &lt;sup class="footnote-reference"&gt;&lt;a href="#b"&gt;3&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="footnote-definition" id="b"&gt;&lt;sup class="footnote-definition-label"&gt;3&lt;/sup&gt;
+&lt;p&gt;This means that a footnote definition cannot be directly inside another footnote definition.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;This means that a footnote cannot be directly inside another footnote's body. &lt;sup class="footnote-reference"&gt;&lt;a href="#e"&gt;4&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;div class="footnote-definition" id="e"&gt;&lt;sup class="footnote-definition-label"&gt;4&lt;/sup&gt;
+&lt;p&gt;They can, however, be inside anything else.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;div class="footnote-definition" id="xkcd"&gt;&lt;sup class="footnote-definition-label"&gt;2&lt;/sup&gt;
+&lt;p&gt;&lt;a href="https://xkcd.com/1208/"&gt;The other kind of nested footnote is, however, considered poor style.&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+</code></pre>
+</div>
+<p>They do need one line between each other.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">[^Doh] Ray Me Fa So La Te Do! [^1]
+
+[^Doh]: I know. Wrong Doe. And it will render right.
+[^1]: Common for people practicing music.
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;&lt;sup class="footnote-reference"&gt;&lt;a href="#Doh"&gt;1&lt;/a&gt;&lt;/sup&gt; Ray Me Fa So La Te Do! &lt;sup class="footnote-reference"&gt;&lt;a href="#1"&gt;2&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;&lt;div class="footnote-definition" id="Doh"&gt;&lt;sup class="footnote-definition-label"&gt;1&lt;/sup&gt;&lt;p&gt;I know. Wrong Doe. And it will render right.
+&lt;sup class="footnote-reference"&gt;&lt;a href="#1"&gt;2&lt;/a&gt;&lt;/sup&gt;: Common for people practicing music.&lt;/p&gt;&lt;/div&gt;
+</code></pre>
+</div>
+<p>Second check for footnotes:</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">[Reference to footnotes A[^1], B[^2] and C[^3].
+
+[^1]: Footnote A.
+[^2]: Footnote B.
+[^3]: Footnote C.
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;[Reference to footnotes A&lt;sup class="footnote-reference"&gt;&lt;a href="#1"&gt;1&lt;/a&gt;&lt;/sup&gt;, B&lt;sup class="footnote-reference"&gt;&lt;a href="#2"&gt;2&lt;/a&gt;&lt;/sup&gt; and C&lt;sup class="footnote-reference"&gt;&lt;a href="#3"&gt;3&lt;/a&gt;&lt;/sup&gt;.&lt;/p&gt;&lt;div class="footnote-definition" id="1"&gt;&lt;sup class="footnote-definition-label"&gt;1&lt;/sup&gt;&lt;p&gt;Footnote A.&lt;/p&gt;&lt;/div&gt;&lt;div class="footnote-definition" id="2"&gt;&lt;sup class="footnote-definition-label"&gt;2&lt;/sup&gt;&lt;p&gt;Footnote B.&lt;/p&gt;&lt;/div&gt;&lt;div class="footnote-definition" id="3"&gt;&lt;sup class="footnote-definition-label"&gt;3&lt;/sup&gt;&lt;p&gt;Footnote C.&lt;/p&gt;&lt;/div&gt;
+</code></pre>
+</div>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../specs/footnotes.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../specs/heading_attrs.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../specs/footnotes.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../specs/heading_attrs.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

@@ -1,0 +1,401 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>CommonMark smart punctuation - pulldown-cmark guide</title>
+
+
+        <!-- Custom HTML head -->
+        <style>
+            .pulldown-cmark-example {
+                display: flex;
+                gap: 1rem;
+                align-items: stretch;
+            }
+            .pulldown-cmark-example > * {
+                width: 50%;
+            }
+        </style>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">Guide</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../third_party/spec.html"><strong aria-hidden="true">1.</strong> CommonMark specification</a></li><li class="chapter-item expanded "><a href="../third_party/smart_punct.html" class="active"><strong aria-hidden="true">2.</strong> CommonMark smart punctuation</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../specs/footnotes.html"><strong aria-hidden="true">3.</strong> footnotes extension</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../specs/old_footnotes.html"><strong aria-hidden="true">3.1.</strong> old footnotes extension</a></li></ol></li><li class="chapter-item expanded "><a href="../specs/heading_attrs.html"><strong aria-hidden="true">4.</strong> heading attributes</a></li><li class="chapter-item expanded "><a href="../specs/metadata_blocks.html"><strong aria-hidden="true">5.</strong> metadata blocks</a></li><li class="chapter-item expanded "><a href="../specs/strikethrough.html"><strong aria-hidden="true">6.</strong> strikethrough</a></li><li class="chapter-item expanded "><a href="../specs/table.html"><strong aria-hidden="true">7.</strong> table</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../third_party/gfm_strikethrough.html"><strong aria-hidden="true">8.</strong> GitHub strikethrough</a></li><li class="chapter-item expanded "><a href="../third_party/gfm_table.html"><strong aria-hidden="true">9.</strong> GitHub tables</a></li><li class="chapter-item expanded "><a href="../third_party/gfm_tasklist.html"><strong aria-hidden="true">10.</strong> GitHub tasklist</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">pulldown-cmark guide</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h2 id="smart-punctuation"><a class="header" href="#smart-punctuation">Smart punctuation</a></h2>
+<p>Open quotes are matched with closed quotes.
+The same method is used for matching openers and closers
+as is used in emphasis parsing:</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">"Hello," said the spider.
+"'Shelob' is my name."
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;“Hello,” said the spider.
+“‘Shelob’ is my name.”&lt;/p&gt;
+</code></pre>
+</div>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">'A', 'B', and 'C' are letters.
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;‘A’, ‘B’, and ‘C’ are letters.&lt;/p&gt;
+</code></pre>
+</div>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">'Oak,' 'elm,' and 'beech' are names of trees.
+So is 'pine.'
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;‘Oak,’ ‘elm,’ and ‘beech’ are names of trees.
+So is ‘pine.’&lt;/p&gt;
+</code></pre>
+</div>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">'He said, "I want to go."'
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;‘He said, “I want to go.”’&lt;/p&gt;
+</code></pre>
+</div>
+<p>A single quote that isn't an open quote matched
+with a close quote will be treated as an
+apostrophe:</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">Were you alive in the 70's?
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;Were you alive in the 70’s?&lt;/p&gt;
+</code></pre>
+</div>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">Here is some quoted '`code`' and a "[quoted link](url)".
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;Here is some quoted ‘&lt;code&gt;code&lt;/code&gt;’ and a “&lt;a href="url"&gt;quoted link&lt;/a&gt;”.&lt;/p&gt;
+</code></pre>
+</div>
+<p>Here the first <code>'</code> is treated as an apostrophe, not
+an open quote, because the final single quote is matched
+by the single quote before <code>jolly</code>:</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">'tis the season to be 'jolly'
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;’tis the season to be ‘jolly’&lt;/p&gt;
+</code></pre>
+</div>
+<p>Multiple apostrophes should not be marked as open/closing quotes.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">'We'll use Jane's boat and John's truck,' Jenna said.
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;‘We’ll use Jane’s boat and John’s truck,’ Jenna said.&lt;/p&gt;
+</code></pre>
+</div>
+<p>An unmatched double quote will be interpreted as a
+left double quote, to facilitate this style:</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">"A paragraph with no closing quote.
+
+"Second paragraph by same speaker, in fiction."
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;“A paragraph with no closing quote.&lt;/p&gt;
+&lt;p&gt;“Second paragraph by same speaker, in fiction.”&lt;/p&gt;
+</code></pre>
+</div>
+<p>A quote following a <code>]</code> or <code>)</code> character cannot
+be an open quote:</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">[a]'s b'
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;[a]’s b’&lt;/p&gt;
+</code></pre>
+</div>
+<p>Quotes that are escaped come out as literal straight
+quotes:</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">\"This is not smart.\"
+This isn\'t either.
+5\'8\"
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;"This is not smart."
+This isn't either.
+5'8"&lt;/p&gt;
+</code></pre>
+</div>
+<p>Two hyphens form an en-dash, three an em-dash.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">Some dashes:  em---em
+en--en
+em --- em
+en -- en
+2--3
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;Some dashes:  em—em
+en–en
+em — em
+en – en
+2–3&lt;/p&gt;
+</code></pre>
+</div>
+<p>A sequence of more than three hyphens is
+parsed as a sequence of em and/or en dashes,
+with no hyphens. If possible, a homogeneous
+sequence of dashes is used (so, 10 hyphens
+= 5 en dashes, and 9 hyphens = 3 em dashes).
+When a heterogeneous sequence must be used,
+the em dashes come first, followed by the en
+dashes, and as few en dashes as possible are
+used (so, 7 hyphens = 2 em dashes an 1 en
+dash).</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">one-
+two--
+three---
+four----
+five-----
+six------
+seven-------
+eight--------
+nine---------
+thirteen-------------.
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;one-
+two–
+three—
+four––
+five—–
+six——
+seven—––
+eight––––
+nine———
+thirteen———––.&lt;/p&gt;
+</code></pre>
+</div>
+<p>Hyphens can be escaped:</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">Escaped hyphens: \-- \-\-\-.
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;Escaped hyphens: -- ---.&lt;/p&gt;
+</code></pre>
+</div>
+<p>Three periods form an ellipsis:</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">Ellipses...and...and....
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;Ellipses…and…and….&lt;/p&gt;
+</code></pre>
+</div>
+<p>Periods can be escaped if ellipsis-formation
+is not wanted:</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">No ellipses\.\.\.
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;No ellipses...&lt;/p&gt;
+</code></pre>
+</div>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../third_party/spec.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../specs/footnotes.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../third_party/spec.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../specs/footnotes.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

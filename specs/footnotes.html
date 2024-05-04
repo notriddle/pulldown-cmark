@@ -1,0 +1,834 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>footnotes extension - pulldown-cmark guide</title>
+
+
+        <!-- Custom HTML head -->
+        <style>
+            .pulldown-cmark-example {
+                display: flex;
+                gap: 1rem;
+                align-items: stretch;
+            }
+            .pulldown-cmark-example > * {
+                width: 50%;
+            }
+        </style>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">Guide</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../third_party/spec.html"><strong aria-hidden="true">1.</strong> CommonMark specification</a></li><li class="chapter-item expanded "><a href="../third_party/smart_punct.html"><strong aria-hidden="true">2.</strong> CommonMark smart punctuation</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../specs/footnotes.html" class="active"><strong aria-hidden="true">3.</strong> footnotes extension</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../specs/old_footnotes.html"><strong aria-hidden="true">3.1.</strong> old footnotes extension</a></li></ol></li><li class="chapter-item expanded "><a href="../specs/heading_attrs.html"><strong aria-hidden="true">4.</strong> heading attributes</a></li><li class="chapter-item expanded "><a href="../specs/metadata_blocks.html"><strong aria-hidden="true">5.</strong> metadata blocks</a></li><li class="chapter-item expanded "><a href="../specs/strikethrough.html"><strong aria-hidden="true">6.</strong> strikethrough</a></li><li class="chapter-item expanded "><a href="../specs/table.html"><strong aria-hidden="true">7.</strong> table</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../third_party/gfm_strikethrough.html"><strong aria-hidden="true">8.</strong> GitHub strikethrough</a></li><li class="chapter-item expanded "><a href="../third_party/gfm_table.html"><strong aria-hidden="true">9.</strong> GitHub tables</a></li><li class="chapter-item expanded "><a href="../third_party/gfm_tasklist.html"><strong aria-hidden="true">10.</strong> GitHub tasklist</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">pulldown-cmark guide</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <p>Run this with <code>cargo test --features gen-tests suite::gfm_footnotes</code>.</p>
+<p>Parts of this test case are based on
+<a href="https://github.com/github/cmark-gfm/blob/1e230827a584ebc9938c3eadc5059c55ef3c9abf/test/extensions.txt#L702">https://github.com/github/cmark-gfm/blob/1e230827a584ebc9938c3eadc5059c55ef3c9abf/test/extensions.txt#L702</a>.
+Other parts were based on trial-and-error with GitHub's issue comment preview.</p>
+<p>This spec describes nearly identical <em>parsing</em> to GFM, but not identical <em>rendering</em>. The HTML
+outputting module may be extended with features such as backreferences, but these are not built
+into the parser, and are unrelated to the syntax in any case. Alternative footnote rendering
+styles can be found in <code>/examples/footnote-rewrite.rs</code>.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">Lorem ipsum.[^a] [^missing]
+
+[^a]: Cool.
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;Lorem ipsum.&lt;sup class="footnote-reference"&gt;&lt;a href="#a"&gt;1&lt;/a&gt;&lt;/sup&gt; [^missing]&lt;/p&gt;
+&lt;div class="footnote-definition" id="a"&gt;&lt;sup class="footnote-definition-label"&gt;1&lt;/sup&gt;
+&lt;p&gt;Cool.&lt;/p&gt;
+&lt;/div&gt;
+</code></pre>
+</div>
+<p>Footnotes can be used inside blockquotes:</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">&gt; This is the song that never ends.\
+&gt; Yes it goes on and on my friends.[^lambchops]
+&gt;
+&gt; [^lambchops]: &lt;https://www.youtube.com/watch?v=0U2zJOryHKQ&gt;
+</code></pre>
+<pre><code class="language-html">&lt;blockquote&gt;
+&lt;p&gt;This is the song that never ends.&lt;br /&gt;
+Yes it goes on and on my friends.&lt;sup class="footnote-reference"&gt;&lt;a href="#lambchops"&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;div class="footnote-definition" id="lambchops"&gt;&lt;sup class="footnote-definition-label"&gt;1&lt;/sup&gt;
+&lt;p&gt;&lt;a href="https://www.youtube.com/watch?v=0U2zJOryHKQ"&gt;https://www.youtube.com/watch?v=0U2zJOryHKQ&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/blockquote&gt;
+</code></pre>
+</div>
+<p>Footnotes can be complex block structures, but their contents must be indented first!</p>
+<p>Without four spaces of indentation, no nesting:</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">Songs that simply loop are a popular way to annoy people. [^examples]
+
+[^examples]:
+ * [The song that never ends](https://www.youtube.com/watch?v=0U2zJOryHKQ)
+ * [I know a song that gets on everybody's nerves](https://www.youtube.com/watch?v=TehWI09qxls)
+ * [Ninety-nine bottles of beer on the wall](https://www.youtube.com/watch?v=qVjCag8XoHQ)
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;Songs that simply loop are a popular way to annoy people. &lt;sup class="footnote-reference"&gt;&lt;a href="#examples"&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;div class="footnote-definition" id="examples"&gt;&lt;sup class="footnote-definition-label"&gt;1&lt;/sup&gt;&lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://www.youtube.com/watch?v=0U2zJOryHKQ"&gt;The song that never ends&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://www.youtube.com/watch?v=TehWI09qxls"&gt;I know a song that gets on everybody's nerves&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://www.youtube.com/watch?v=qVjCag8XoHQ"&gt;Ninety-nine bottles of beer on the wall&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</code></pre>
+</div>
+<p>Yes, nesting:</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">Songs that simply loop are a popular way to annoy people. [^examples]
+
+[^examples]:
+    * [The song that never ends](https://www.youtube.com/watch?v=0U2zJOryHKQ)
+    * [I know a song that gets on everybody's nerves](https://www.youtube.com/watch?v=TehWI09qxls)
+    * [Ninety-nine bottles of beer on the wall](https://www.youtube.com/watch?v=qVjCag8XoHQ)
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;Songs that simply loop are a popular way to annoy people. &lt;sup class="footnote-reference"&gt;&lt;a href="#examples"&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;div class="footnote-definition" id="examples"&gt;&lt;sup class="footnote-definition-label"&gt;1&lt;/sup&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://www.youtube.com/watch?v=0U2zJOryHKQ"&gt;The song that never ends&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://www.youtube.com/watch?v=TehWI09qxls"&gt;I know a song that gets on everybody's nerves&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://www.youtube.com/watch?v=qVjCag8XoHQ"&gt;Ninety-nine bottles of beer on the wall&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+</code></pre>
+</div>
+<p>How this works with indented code blocks, blockquotes:</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">[^not-code] [^code] [^quote] [^not-quote] [^indented-quote]
+
+[^not-code]:         not code
+
+[^code]:
+        code
+
+[^quote]: &gt; quote
+
+[^not-quote]:
+ &gt; external quote
+
+[^indented-quote]:
+    &gt; indented quote
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;&lt;sup class="footnote-reference"&gt;&lt;a href="#not-code"&gt;1&lt;/a&gt;&lt;/sup&gt; &lt;sup class="footnote-reference"&gt;&lt;a href="#code"&gt;2&lt;/a&gt;&lt;/sup&gt; &lt;sup class="footnote-reference"&gt;&lt;a href="#quote"&gt;3&lt;/a&gt;&lt;/sup&gt; &lt;sup class="footnote-reference"&gt;&lt;a href="#not-quote"&gt;4&lt;/a&gt;&lt;/sup&gt; &lt;sup class="footnote-reference"&gt;&lt;a href="#indented-quote"&gt;5&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;div class="footnote-definition" id="not-code"&gt;&lt;sup class="footnote-definition-label"&gt;1&lt;/sup&gt;
+&lt;p&gt;not code&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="footnote-definition" id="code"&gt;&lt;sup class="footnote-definition-label"&gt;2&lt;/sup&gt;
+&lt;pre&gt;&lt;code&gt;code
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="footnote-definition" id="quote"&gt;&lt;sup class="footnote-definition-label"&gt;3&lt;/sup&gt;
+&lt;blockquote&gt;&lt;p&gt;quote&lt;/p&gt;&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;div class="footnote-definition" id="not-quote"&gt;&lt;sup class="footnote-definition-label"&gt;4&lt;/sup&gt;&lt;/div&gt;
+&lt;blockquote&gt;&lt;p&gt;external quote&lt;/p&gt;&lt;/blockquote&gt;&lt;div class="footnote-definition" id="indented-quote"&gt;&lt;sup class="footnote-definition-label"&gt;5&lt;/sup&gt;
+&lt;blockquote&gt;&lt;p&gt;indented quote&lt;/p&gt;&lt;/blockquote&gt;
+&lt;/div&gt;
+</code></pre>
+</div>
+<p>Line breaks in paragraphs, however, are okay. Note that GitHub <em>comments</em> have hard line breaks without escapes, while <em>Gists</em> don't.
+To see compatible rendering with the examples in this file, try the code in a GitHub Gist file with a <code>.md</code> extension.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">[^ab] [^cd]
+
+[^ab]: a
+b
+
+[^cd]: c\
+d
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;&lt;sup class="footnote-reference"&gt;&lt;a href="#ab"&gt;1&lt;/a&gt;&lt;/sup&gt; &lt;sup class="footnote-reference"&gt;&lt;a href="#cd"&gt;2&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;div class="footnote-definition" id="ab"&gt;&lt;sup class="footnote-definition-label"&gt;1&lt;/sup&gt;
+&lt;p&gt;a
+b&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="footnote-definition" id="cd"&gt;&lt;sup class="footnote-definition-label"&gt;2&lt;/sup&gt;
+&lt;p&gt;c&lt;br&gt;
+d&lt;/p&gt;
+&lt;/div&gt;
+</code></pre>
+</div>
+<p>Footnotes can even have multiple paragraphs. You need to indent, though.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">[^lorem]: If heaven ever wishes to grant me a boon, it will be a total effacing of the results of a mere chance which fixed my eye on a certain stray piece of shelf-paper. It was nothing on which I would naturally have stumbled in the course of my daily round, for it was an old number of an Australian journal, the Sydney Bulletin for April 18, 1925. It had escaped even the cutting bureau which had at the time of its issuance been avidly collecting material for my uncle's research.
+
+I had largely given over my inquiries into what Professor Angell called the "Cthulhu Cult", and was visiting a learned friend in Paterson, New Jersey; the curator of a local museum and a mineralogist of note. Examining one day the reserve specimens roughly set on the storage shelves in a rear room of the museum, my eye was caught by an odd picture in one of the old papers spread beneath the stones. It was the Sydney Bulletin I have mentioned, for my friend had wide affiliations in all conceivable foreign parts; and the picture was a half-tone cut of a hideous stone image almost identical with that which Legrasse had found in the swamp.
+
+[^ipsum]: If heaven ever wishes to grant me a boon, it will be a total effacing of the results of a mere chance which fixed my eye on a certain stray piece of shelf-paper. It was nothing on which I would naturally have stumbled in the course of my daily round, for it was an old number of an Australian journal, the Sydney Bulletin for April 18, 1925. It had escaped even the cutting bureau which had at the time of its issuance been avidly collecting material for my uncle's research.
+
+    I had largely given over my inquiries into what Professor Angell called the "Cthulhu Cult", and was visiting a learned friend in Paterson, New Jersey; the curator of a local museum and a mineralogist of note. Examining one day the reserve specimens roughly set on the storage shelves in a rear room of the museum, my eye was caught by an odd picture in one of the old papers spread beneath the stones. It was the Sydney Bulletin I have mentioned, for my friend had wide affiliations in all conceivable foreign parts; and the picture was a half-tone cut of a hideous stone image almost identical with that which Legrasse had found in the swamp.
+</code></pre>
+<pre><code class="language-html">&lt;div class="footnote-definition" id="lorem"&gt;&lt;sup class="footnote-definition-label"&gt;1&lt;/sup&gt;
+&lt;p&gt;If heaven ever wishes to grant me a boon, it will be a total effacing of the results of a mere chance which fixed my eye on a certain stray piece of shelf-paper. It was nothing on which I would naturally have stumbled in the course of my daily round, for it was an old number of an Australian journal, the Sydney Bulletin for April 18, 1925. It had escaped even the cutting bureau which had at the time of its issuance been avidly collecting material for my uncle's research.&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;I had largely given over my inquiries into what Professor Angell called the "Cthulhu Cult", and was visiting a learned friend in Paterson, New Jersey; the curator of a local museum and a mineralogist of note. Examining one day the reserve specimens roughly set on the storage shelves in a rear room of the museum, my eye was caught by an odd picture in one of the old papers spread beneath the stones. It was the Sydney Bulletin I have mentioned, for my friend had wide affiliations in all conceivable foreign parts; and the picture was a half-tone cut of a hideous stone image almost identical with that which Legrasse had found in the swamp.&lt;/p&gt;
+&lt;div class="footnote-definition" id="ipsum"&gt;&lt;sup class="footnote-definition-label"&gt;2&lt;/sup&gt;
+&lt;p&gt;If heaven ever wishes to grant me a boon, it will be a total effacing of the results of a mere chance which fixed my eye on a certain stray piece of shelf-paper. It was nothing on which I would naturally have stumbled in the course of my daily round, for it was an old number of an Australian journal, the Sydney Bulletin for April 18, 1925. It had escaped even the cutting bureau which had at the time of its issuance been avidly collecting material for my uncle's research.&lt;/p&gt;
+&lt;p&gt;I had largely given over my inquiries into what Professor Angell called the "Cthulhu Cult", and was visiting a learned friend in Paterson, New Jersey; the curator of a local museum and a mineralogist of note. Examining one day the reserve specimens roughly set on the storage shelves in a rear room of the museum, my eye was caught by an odd picture in one of the old papers spread beneath the stones. It was the Sydney Bulletin I have mentioned, for my friend had wide affiliations in all conceivable foreign parts; and the picture was a half-tone cut of a hideous stone image almost identical with that which Legrasse had found in the swamp.&lt;/p&gt;
+&lt;/div&gt;
+</code></pre>
+</div>
+<p>A footnote will end on a single line break if the following paragraph isn't indented. Note that
+this behavior changed in version 0.1.0, to become more like hoedown. See issue #21.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">[^ipsum]: How much wood would a woodchuck chuck.
+
+If a woodchuck could chuck wood.
+
+
+# Forms of entertainment that aren't childish
+</code></pre>
+<pre><code class="language-html">&lt;div class="footnote-definition" id="ipsum"&gt;&lt;sup class="footnote-definition-label"&gt;1&lt;/sup&gt;
+&lt;p&gt;How much wood would a woodchuck chuck.&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;If a woodchuck could chuck wood.&lt;/p&gt;
+&lt;h1&gt;Forms of entertainment that aren't childish&lt;/h1&gt;
+</code></pre>
+</div>
+<p>If the following footnote is indented, however, then it'll be included, regardless of how many
+blank lines separate it from the footnote definition. See
+<a href="https://gist.github.com/notriddle/39ffd52799604bc2cf923fe21a1ea0a9">https://gist.github.com/notriddle/39ffd52799604bc2cf923fe21a1ea0a9</a>.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">Footnotes [^one] [^many].
+
+[^one]:
+
+
+
+
+
+    first paragraph inside footnote
+
+[^many]: first paragraph inside footnote
+
+
+
+
+
+    second paragraph still inside footnote
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;Footnotes &lt;sup class="footnote-reference"&gt;&lt;a href="#one"&gt;1&lt;/a&gt;&lt;/sup&gt; &lt;sup class="footnote-reference"&gt;&lt;a href="#many"&gt;2&lt;/a&gt;&lt;/sup&gt;.&lt;/p&gt;
+&lt;div class="footnote-definition" id="one"&gt;&lt;sup class="footnote-definition-label"&gt;1&lt;/sup&gt;
+&lt;p&gt;first paragraph inside footnote&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="footnote-definition" id="many"&gt;&lt;sup class="footnote-definition-label"&gt;2&lt;/sup&gt;
+&lt;p&gt;first paragraph inside footnote&lt;/p&gt;
+&lt;p&gt;second paragraph still inside footnote&lt;/p&gt;
+&lt;/div&gt;
+</code></pre>
+</div>
+<p>A footnote will also break if it's inside another container.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">&gt; He's also really stupid. [^why]
+&gt;
+&gt; [^why]: Because your mamma!
+
+As such, we can guarantee that the non-childish forms of entertainment are probably more entertaining to adults, since, having had a whole childhood doing the childish ones, the non-childish ones are merely the ones that haven't gotten boring yet.
+</code></pre>
+<pre><code class="language-html">&lt;blockquote&gt;
+&lt;p&gt;He's also really stupid. &lt;sup class="footnote-reference"&gt;&lt;a href="#why"&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;div class="footnote-definition" id="why"&gt;&lt;sup class="footnote-definition-label"&gt;1&lt;/sup&gt;
+&lt;p&gt;Because your mamma!&lt;/p&gt;
+&lt;/div&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;As such, we can guarantee that the non-childish forms of entertainment are probably more entertaining to adults, since, having had a whole childhood doing the childish ones, the non-childish ones are merely the ones that haven't gotten boring yet.&lt;/p&gt;
+</code></pre>
+</div>
+<p>As a special exception, footnotes cannot be nested directly inside each other.
+If they are, they act like they're declared beside each other.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">Nested footnotes are considered poor style. [^a] [^xkcd] [^indent1] [^indent2]
+
+[^a]: This does not mean that footnotes cannot reference each other. [^b]
+
+[^b]: This means that a footnote definition cannot be directly inside another footnote definition.
+&gt; This means that a footnote cannot be directly inside another footnote's body. [^e]
+&gt;
+&gt; [^e]: They can, however, be inside anything else.
+
+[^xkcd]: [The other kind of nested footnote is, however, considered poor style.](https://xkcd.com/1208/)
+
+[^indent1]: indent1
+
+    [^indent2]: indent2
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;Nested footnotes are considered poor style. &lt;sup class="footnote-reference"&gt;&lt;a href="#a"&gt;1&lt;/a&gt;&lt;/sup&gt; &lt;sup class="footnote-reference"&gt;&lt;a href="#xkcd"&gt;2&lt;/a&gt;&lt;/sup&gt; &lt;sup class="footnote-reference"&gt;&lt;a href="#indent1"&gt;3&lt;/a&gt;&lt;/sup&gt; &lt;sup class="footnote-reference"&gt;&lt;a href="#indent2"&gt;4&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;div class="footnote-definition" id="a"&gt;&lt;sup class="footnote-definition-label"&gt;1&lt;/sup&gt;
+&lt;p&gt;This does not mean that footnotes cannot reference each other. &lt;sup class="footnote-reference"&gt;&lt;a href="#b"&gt;5&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="footnote-definition" id="b"&gt;&lt;sup class="footnote-definition-label"&gt;5&lt;/sup&gt;
+&lt;p&gt;This means that a footnote definition cannot be directly inside another footnote definition.&lt;/p&gt;
+&lt;/div&gt;
+&lt;blockquote&gt;
+&lt;p&gt;This means that a footnote cannot be directly inside another footnote's body. &lt;sup class="footnote-reference"&gt;&lt;a href="#e"&gt;6&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;div class="footnote-definition" id="e"&gt;&lt;sup class="footnote-definition-label"&gt;6&lt;/sup&gt;
+&lt;p&gt;They can, however, be inside anything else.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/blockquote&gt;
+&lt;div class="footnote-definition" id="xkcd"&gt;&lt;sup class="footnote-definition-label"&gt;2&lt;/sup&gt;
+&lt;p&gt;&lt;a href="https://xkcd.com/1208/"&gt;The other kind of nested footnote is, however, considered poor style.&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="footnote-definition" id="indent1"&gt;&lt;sup class="footnote-definition-label"&gt;3&lt;/sup&gt;
+&lt;p&gt;indent1&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="footnote-definition" id="indent2"&gt;&lt;sup class="footnote-definition-label"&gt;4&lt;/sup&gt;
+&lt;p&gt;indent2&lt;/p&gt;
+&lt;/div&gt;
+</code></pre>
+</div>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">[^foo] [^bar]
+
+[^foo]: [^bar]: 1
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;&lt;sup class="footnote-reference"&gt;&lt;a href="#foo"&gt;1&lt;/a&gt;&lt;/sup&gt; &lt;sup class="footnote-reference"&gt;&lt;a href="#bar"&gt;2&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;div class="footnote-definition" id="foo"&gt;&lt;sup class="footnote-definition-label"&gt;1&lt;/sup&gt;&lt;/div&gt;
+&lt;div class="footnote-definition" id="bar"&gt;&lt;sup class="footnote-definition-label"&gt;2&lt;/sup&gt;
+&lt;p&gt;1&lt;/p&gt;
+&lt;/div&gt;
+</code></pre>
+</div>
+<p>They do <strong>not</strong> need one line between each other.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">[^Doh] Ray Me Fa So La Te Do! [^1]
+
+[^Doh]: I know. Wrong Doe. And it won't render right.
+[^1]: Common for people practicing music.
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;&lt;sup class="footnote-reference"&gt;&lt;a href="#Doh"&gt;1&lt;/a&gt;&lt;/sup&gt; Ray Me Fa So La Te Do! &lt;sup class="footnote-reference"&gt;&lt;a href="#1"&gt;2&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;div class="footnote-definition" id="Doh"&gt;&lt;sup class="footnote-definition-label"&gt;1&lt;/sup&gt;
+&lt;p&gt;I know. Wrong Doe. And it won't render right.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="footnote-definition" id="1"&gt;&lt;sup class="footnote-definition-label"&gt;2&lt;/sup&gt;
+&lt;p&gt;Common for people practicing music.&lt;/p&gt;
+&lt;/div&gt;
+</code></pre>
+</div>
+<p>ISSUE 413</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">Lorem ipsum.[^a]
+
+An unordered list before the footnotes:
+* Ipsum
+* Lorem
+
+[^a]: Cool.
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;Lorem ipsum.&lt;sup class="footnote-reference"&gt;&lt;a href="#a"&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;p&gt;An unordered list before the footnotes:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Ipsum&lt;/li&gt;
+&lt;li&gt;Lorem&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="footnote-definition" id="a"&gt;&lt;sup class="footnote-definition-label"&gt;1&lt;/sup&gt;
+&lt;p&gt;Cool.&lt;/p&gt;
+&lt;/div&gt;
+</code></pre>
+</div>
+<p>Test case for more footnotes with list. Note that, while the DOM produced here is similar to
+GitHub's DOM (except GitHub reorders all footnotes to the end), they have a weird flexbox setup
+that causes lists nested inside footnotes to look really weird.</p>
+<p><a href="https://gist.github.com/notriddle/07360ab169c650b72ab8921089b12456">https://gist.github.com/notriddle/07360ab169c650b72ab8921089b12456</a></p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">Songs that simply loop are a popular way to annoy people. [^examples]
+
+[^examples]: * [The song that never ends](https://www.youtube.com/watch?v=0U2zJOryHKQ)
+* [I know a song that gets on everybody's nerves](https://www.youtube.com/watch?v=TehWI09qxls)
+* [Ninety-nine bottles of beer on the wall](https://www.youtube.com/watch?v=qVjCag8XoHQ)
+
+
+Songs that simply loop are a popular way to annoy people. [^examples2]
+
+[^examples2]: * [The song that never ends](https://www.youtube.com/watch?v=0U2zJOryHKQ) 2
+    * [I know a song that gets on everybody's nerves](https://www.youtube.com/watch?v=TehWI09qxls) 2
+    - [Ninety-nine bottles of beer on the wall](https://www.youtube.com/watch?v=qVjCag8XoHQ) 2
+
+
+Songs that simply loop are a popular way to annoy people. [^examples3]
+
+[^examples3]: * [The song that never ends](https://www.youtube.com/watch?v=0U2zJOryHKQ) 3
+
+    * [I know a song that gets on everybody's nerves](https://www.youtube.com/watch?v=TehWI09qxls) 3
+
+    * [Ninety-nine bottles of beer on the wall](https://www.youtube.com/watch?v=qVjCag8XoHQ) 3
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;Songs that simply loop are a popular way to annoy people. &lt;sup class="footnote-reference"&gt;&lt;a href="#examples"&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;div class="footnote-definition" id="examples"&gt;&lt;sup class="footnote-definition-label"&gt;1&lt;/sup&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://www.youtube.com/watch?v=0U2zJOryHKQ"&gt;The song that never ends&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://www.youtube.com/watch?v=TehWI09qxls"&gt;I know a song that gets on everybody's nerves&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://www.youtube.com/watch?v=qVjCag8XoHQ"&gt;Ninety-nine bottles of beer on the wall&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Songs that simply loop are a popular way to annoy people. &lt;sup class="footnote-reference"&gt;&lt;a href="#examples2"&gt;2&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;div class="footnote-definition" id="examples2"&gt;&lt;sup class="footnote-definition-label"&gt;2&lt;/sup&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://www.youtube.com/watch?v=0U2zJOryHKQ"&gt;The song that never ends&lt;/a&gt; 2&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://www.youtube.com/watch?v=TehWI09qxls"&gt;I know a song that gets on everybody's nerves&lt;/a&gt; 2&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://www.youtube.com/watch?v=qVjCag8XoHQ"&gt;Ninety-nine bottles of beer on the wall&lt;/a&gt; 2&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;p&gt;Songs that simply loop are a popular way to annoy people. &lt;sup class="footnote-reference"&gt;&lt;a href="#examples3"&gt;3&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;div class="footnote-definition" id="examples3"&gt;&lt;sup class="footnote-definition-label"&gt;3&lt;/sup&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href="https://www.youtube.com/watch?v=0U2zJOryHKQ"&gt;The song that never ends&lt;/a&gt; 3&lt;/p&gt;
+&lt;/li&gt;&lt;li&gt;&lt;p&gt;&lt;a href="https://www.youtube.com/watch?v=TehWI09qxls"&gt;I know a song that gets on everybody's nerves&lt;/a&gt; 3&lt;/p&gt;
+&lt;/li&gt;&lt;li&gt;&lt;p&gt;&lt;a href="https://www.youtube.com/watch?v=qVjCag8XoHQ"&gt;Ninety-nine bottles of beer on the wall&lt;/a&gt; 3&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+</code></pre>
+</div>
+<p>Test case for the relationship between link references and footnotes.
+<a href="https://gist.github.com/notriddle/5625a3c1cb70b3067a01d7465f9d10f1">https://gist.github.com/notriddle/5625a3c1cb70b3067a01d7465f9d10f1</a></p>
+<p>GitHub writes
+<code>My [cmark-gfm]&lt;sup class="footnote-reference"&gt;&lt;a href="#examples"&gt;1&lt;/a&gt;&lt;/sup&gt;.</code>
+in the first paragraph. This seems like a bug, but <a href="https://markdown-it.github.io/#md3=%7B%22source%22%3A%22%5B%5Efoo%5D%5B%5D%5Cn%5Cn%5B%5Efoo%5D%5Bbaz%5D%5Cn%5Cn%5Bbaz%5D%5B%5Efoo%5D%5Cn%5Cn%5B%5Efoo%5D%3A%20bar%5Cn%5Cn%5Bbaz%5D%3A%20https%3A%2F%2Frust-lang.org%22%2C%22defaults%22%3A%7B%22html%22%3Afalse%2C%22xhtmlOut%22%3Afalse%2C%22breaks%22%3Afalse%2C%22langPrefix%22%3A%22language-%22%2C%22linkify%22%3Atrue%2C%22typographer%22%3Atrue%2C%22_highlight%22%3Atrue%2C%22_strict%22%3Afalse%2C%22_view%22%3A%22html%22%7D%7D">markdown-it</a> and <a href="https://pandoc.org/try/?params=%7B%22text%22%3A%22%5B%5Efoo%5D%5B%5D%5Cn%5Cn%5B%5Efoo%5D%5Bbaz%5D%5Cn%5Cn%5Bbaz%5D%5B%5Efoo%5D%5Cn%5Cn%5B%5Efoo%5D%3A+bar%5Cn%5Cn%5Bbaz%5D%3A+https%3A%2F%2Frust-lang.org%22%2C%22to%22%3A%22html5%22%2C%22from%22%3A%22commonmark_x%22%2C%22standalone%22%3Afalse%2C%22embed-resources%22%3Afalse%2C%22table-of-contents%22%3Afalse%2C%22number-sections%22%3Afalse%2C%22citeproc%22%3Afalse%2C%22html-math-method%22%3A%22plain%22%2C%22wrap%22%3A%22auto%22%2C%22highlight-style%22%3Anull%2C%22files%22%3A%7B%7D%2C%22template%22%3Anull%7D">commonmark-hs</a>
+both do it, too, so it's probably not worth it to be different here.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">My [cmark-gfm][^c].
+
+My [cmark-gfm][cmark-gfm][^c].
+
+My [cmark-gfm][][^c].
+
+My [cmark-gfm] [^c].
+
+My [cmark-gfm[^c]].
+
+[cmark-gfm]: https://github.com/github/cmark-gfm/blob/1e230827a584ebc9938c3eadc5059c55ef3c9abf/test/extensions.txt#L702
+
+[^c]: cmark-gfm is under the MIT license, so incorporating parts of its
+    test suite into pulldown-cmark should be fine.
+
+
+My [otherlink[^c]].
+
+[otherlink[^c]]: https://github.com/github/cmark-gfm/blob/1e230827a584ebc9938c3eadc5059c55ef3c9abf/test/extensions.txt#L702
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;My [cmark-gfm]&lt;sup class="footnote-reference"&gt;&lt;a href="#c"&gt;1&lt;/a&gt;&lt;/sup&gt;.&lt;/p&gt;
+&lt;p&gt;My &lt;a href="https://github.com/github/cmark-gfm/blob/1e230827a584ebc9938c3eadc5059c55ef3c9abf/test/extensions.txt#L702"&gt;cmark-gfm&lt;/a&gt;&lt;sup class="footnote-reference"&gt;&lt;a href="#c"&gt;1&lt;/a&gt;&lt;/sup&gt;.&lt;/p&gt;
+&lt;p&gt;My &lt;a href="https://github.com/github/cmark-gfm/blob/1e230827a584ebc9938c3eadc5059c55ef3c9abf/test/extensions.txt#L702"&gt;cmark-gfm&lt;/a&gt;&lt;sup class="footnote-reference"&gt;&lt;a href="#c"&gt;1&lt;/a&gt;&lt;/sup&gt;.&lt;/p&gt;
+&lt;p&gt;My &lt;a href="https://github.com/github/cmark-gfm/blob/1e230827a584ebc9938c3eadc5059c55ef3c9abf/test/extensions.txt#L702"&gt;cmark-gfm&lt;/a&gt; &lt;sup class="footnote-reference"&gt;&lt;a href="#c"&gt;1&lt;/a&gt;&lt;/sup&gt;.&lt;/p&gt;
+&lt;p&gt;My [cmark-gfm&lt;sup class="footnote-reference"&gt;&lt;a href="#c"&gt;1&lt;/a&gt;&lt;/sup&gt;].&lt;/p&gt;
+&lt;div class="footnote-definition" id="c"&gt;&lt;sup class="footnote-definition-label"&gt;1&lt;/sup&gt;
+&lt;p&gt;cmark-gfm is under the MIT license, so incorporating parts of its
+test suite into pulldown-cmark should be fine.&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;My [otherlink&lt;sup class="footnote-reference"&gt;&lt;a href="#c"&gt;1&lt;/a&gt;&lt;/sup&gt;].&lt;/p&gt;
+&lt;p&gt;[otherlink&lt;sup class="footnote-reference"&gt;&lt;a href="#c"&gt;1&lt;/a&gt;&lt;/sup&gt;]: https://github.com/github/cmark-gfm/blob/1e230827a584ebc9938c3eadc5059c55ef3c9abf/test/extensions.txt#L702&lt;/p&gt;
+</code></pre>
+</div>
+<p>If a footnote definition is followed by text indented four spaces or one tab, that text will be treated as part of the footnote instead of being an indented code block. To preserve the current behavior, writing code that will be interpreted the same way under both editions, separate the code block from the footnote using an un-indented HTML comment:</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">[^1]: footnote definition text
+
+&lt;!-- --&gt;
+
+    // indented code block
+    fn main() {
+        println!("hello world!");
+    }
+</code></pre>
+<pre><code class="language-html">&lt;div class="footnote-definition" id="1"&gt;&lt;sup class="footnote-definition-label"&gt;1&lt;/sup&gt;
+&lt;p&gt;footnote definition text&lt;/p&gt;
+&lt;/div&gt;
+&lt;!-- --&gt;
+&lt;pre&gt;&lt;code&gt;// indented code block
+fn main() {
+    println!("hello world!");
+}
+&lt;/code&gt;&lt;/pre&gt;
+</code></pre>
+</div>
+<p>Footnote definitions no longer need to be separated by blank lines. To preserve the current behavior, if you intentionally want to write a footnote reference followed by a colon at the start of a line, use a backslash escape:</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">[^1]: footnote definition text
+[^1]\: this is a reference, rather than a definition
+</code></pre>
+<pre><code class="language-html">&lt;div class="footnote-definition" id="1"&gt;&lt;sup class="footnote-definition-label"&gt;1&lt;/sup&gt;
+&lt;p&gt;footnote definition text
+&lt;sup class="footnote-reference"&gt;&lt;a href="#1"&gt;1&lt;/a&gt;&lt;/sup&gt;: this is a reference, rather than a definition&lt;/p&gt;
+&lt;/div&gt;
+</code></pre>
+</div>
+<p>If a footnote definition is immediately followed by a list, block quote, or table, it needs to be indented by four spaces to be considered part of the footnote. To preserve the current behavior, writing code that will be interpreted the same way in either edition, you'll need to fall back to HTML syntax, since there's no easy way to write code that the <em>new</em> syntax will accept as part of the footnote without the <em>old</em> syntax considering it a code block.</p>
+<p>When migrating to the new Edition, a table within a footnote can be written like this (under the old Edition, the table is treated as source code):</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">[^1]:
+
+    | column1 | column2 |
+    |---------|---------|
+    | row1a   | row1b   |
+    | row2a   | row2b   |
+</code></pre>
+<pre><code class="language-html">&lt;div class="footnote-definition" id="1"&gt;&lt;sup class="footnote-definition-label"&gt;1&lt;/sup&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;&lt;th&gt;column1&lt;/th&gt;&lt;th&gt;column2&lt;/th&gt;&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;row1a&lt;/td&gt;&lt;td&gt;row1b&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;row2a&lt;/td&gt;&lt;td&gt;row2b&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+</code></pre>
+</div>
+<p>While <a href="https://www.markdownguide.org/extended-syntax/#footnotes">Markdown Guide</a> claims that you can't put footnote definitions inside lists, block quotes,
+or tables. When <a href="https://gist.github.com/notriddle/169e8735d79639cdf6b5c4b5ba643861">I try it</a> in GitHub, footnote definitions are parsed when nested within
+lists and blockquotes, but not tables. A footnote definition will interrupt a table if it's at the
+start of a line, or just not be parsed if the table has a pipe at the start of the line.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">* First
+  [^1]: test
+* Second [^1] test
+
+
+&gt; first
+&gt; [^2]: test
+&gt; Second [^2] test
+
+
+   First   | Second
+-----------|----------
+first      | second
+[^3]: test | test [^3]
+
+
+|    First   | Second    |
+|------------|-----------|
+| first      | second    |
+| [^4]: test | test [^4] |
+
+&gt; [^5]: * test [^5]
+</code></pre>
+<pre><code class="language-html">&lt;ul&gt;
+&lt;li&gt;First
+&lt;div class="footnote-definition" id="1"&gt;&lt;sup class="footnote-definition-label"&gt;1&lt;/sup&gt;
+&lt;p&gt;test&lt;/p&gt;
+&lt;/div&gt;
+&lt;/li&gt;
+&lt;li&gt;Second &lt;sup class="footnote-reference"&gt;&lt;a href="#1"&gt;1&lt;/a&gt;&lt;/sup&gt; test&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;first&lt;/p&gt;
+&lt;div class="footnote-definition" id="2"&gt;&lt;sup class="footnote-definition-label"&gt;2&lt;/sup&gt;
+&lt;p&gt;test
+Second &lt;sup class="footnote-reference"&gt;&lt;a href="#2"&gt;2&lt;/a&gt;&lt;/sup&gt; test&lt;/p&gt;
+&lt;/div&gt;
+&lt;/blockquote&gt;
+&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;First&lt;/th&gt;&lt;th&gt;Second&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;first&lt;/td&gt;&lt;td&gt;second&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+&lt;div class="footnote-definition" id="3"&gt;&lt;sup class="footnote-definition-label"&gt;3&lt;/sup&gt;
+&lt;p&gt;test | test &lt;sup class="footnote-reference"&gt;&lt;a href="#3"&gt;3&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;First&lt;/th&gt;&lt;th&gt;Second&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;first&lt;/td&gt;&lt;td&gt;second&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;[^4]: test&lt;/td&gt;&lt;td&gt;test [^4]&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+&lt;blockquote&gt;
+&lt;div class="footnote-definition" id="5"&gt;&lt;sup class="footnote-definition-label"&gt;4&lt;/sup&gt;
+&lt;ul&gt;
+&lt;li&gt;test &lt;sup class="footnote-reference"&gt;&lt;a href="#5"&gt;4&lt;/a&gt;&lt;/sup&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/blockquote&gt;
+</code></pre>
+</div>
+<p>Footnote labels cannot be empty.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">Test [^] link
+
+[^]: https://rust-lang.org
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;Test &lt;a href="https://rust-lang.org"&gt;^&lt;/a&gt; link&lt;/p&gt;
+</code></pre>
+</div>
+<p>Footnote labels cannot contain line breaks, even where link labels can.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">[^foo\
+bar]: not a footnote definition
+
+[baz\
+quux]: https://rust-lang.org
+
+[first
+second]: https://rust-lang.org
+
+[^third
+fourth]: not a footnote definition
+
+[baz\
+quux]
+[^foo\
+bar]
+[first
+second]
+[^third
+fourth]
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;[^foo&lt;br&gt;
+bar]: not a footnote definition&lt;/p&gt;
+&lt;p&gt;[^third
+fourth]: not a footnote definition&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://rust-lang.org"&gt;baz&lt;br&gt;
+quux&lt;/a&gt;
+[^foo&lt;br&gt;
+bar]
+&lt;a href="https://rust-lang.org"&gt;first
+second&lt;/a&gt;
+[^third
+fourth]&lt;/p&gt;
+</code></pre>
+</div>
+<p>The above rules imply a few cases where something starts with <code>^</code>, but actually
+parses as a link definition.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">[^foo
+]: https://rust-lang.org
+
+[^foo
+]
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;&lt;a href="https://rust-lang.org"&gt;^foo
+&lt;/a&gt;&lt;/p&gt;
+</code></pre>
+</div>
+<p>Footnote definitions can be indented up to three spaces.
+At four spaces, it becomes a code block.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">footnote [^baz]
+footnote [^quux]
+
+    [^quux]: x
+
+   [^baz]: x
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;footnote &lt;sup class="footnote-reference"&gt;&lt;a href="#baz"&gt;1&lt;/a&gt;&lt;/sup&gt;
+footnote [^quux]&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[^quux]: x
+&lt;/code&gt;&lt;/pre&gt;
+&lt;div class="footnote-definition" id="baz"&gt;&lt;sup class="footnote-definition-label"&gt;1&lt;/sup&gt;
+&lt;p&gt;x&lt;/p&gt;
+&lt;/div&gt;
+</code></pre>
+</div>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../third_party/smart_punct.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../specs/old_footnotes.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../third_party/smart_punct.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../specs/old_footnotes.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

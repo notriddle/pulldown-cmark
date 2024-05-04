@@ -1,0 +1,938 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>table - pulldown-cmark guide</title>
+
+
+        <!-- Custom HTML head -->
+        <style>
+            .pulldown-cmark-example {
+                display: flex;
+                gap: 1rem;
+                align-items: stretch;
+            }
+            .pulldown-cmark-example > * {
+                width: 50%;
+            }
+        </style>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">Guide</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../third_party/spec.html"><strong aria-hidden="true">1.</strong> CommonMark specification</a></li><li class="chapter-item expanded "><a href="../third_party/smart_punct.html"><strong aria-hidden="true">2.</strong> CommonMark smart punctuation</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../specs/footnotes.html"><strong aria-hidden="true">3.</strong> footnotes extension</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../specs/old_footnotes.html"><strong aria-hidden="true">3.1.</strong> old footnotes extension</a></li></ol></li><li class="chapter-item expanded "><a href="../specs/heading_attrs.html"><strong aria-hidden="true">4.</strong> heading attributes</a></li><li class="chapter-item expanded "><a href="../specs/metadata_blocks.html"><strong aria-hidden="true">5.</strong> metadata blocks</a></li><li class="chapter-item expanded "><a href="../specs/strikethrough.html"><strong aria-hidden="true">6.</strong> strikethrough</a></li><li class="chapter-item expanded "><a href="../specs/table.html" class="active"><strong aria-hidden="true">7.</strong> table</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../third_party/gfm_strikethrough.html"><strong aria-hidden="true">8.</strong> GitHub strikethrough</a></li><li class="chapter-item expanded "><a href="../third_party/gfm_table.html"><strong aria-hidden="true">9.</strong> GitHub tables</a></li><li class="chapter-item expanded "><a href="../third_party/gfm_tasklist.html"><strong aria-hidden="true">10.</strong> GitHub tasklist</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">pulldown-cmark guide</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <p>Run this with <code>cargo test --features gen-tests suite::table</code>.</p>
+<p>Adapted from original by replacing <code>td</code> elements by <code>th</code> elements inside <code>thead</code>
+and disabling the third test.</p>
+<h1 id="false-match"><a class="header" href="#false-match">False match</a></h1>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">Test header
+-----------
+</code></pre>
+<pre><code class="language-html">&lt;h2&gt;Test header&lt;/h2&gt;
+</code></pre>
+</div>
+<h1 id="true-match"><a class="header" href="#true-match">True match</a></h1>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">Test|Table
+----|-----
+</code></pre>
+<pre><code class="language-html">&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Test&lt;/th&gt;&lt;th&gt;Table&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;/tbody&gt;
+&lt;/table&gt;
+</code></pre>
+</div>
+<h1 id="actual-rows-in-it"><a class="header" href="#actual-rows-in-it">Actual rows in it</a></h1>
+<pre><code class="language-DISABLED example">Test|Table
+----|-----
+Test row
+Test|2
+
+Test ending
+.
+&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Test&lt;/th&gt;&lt;th&gt;Table&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;Test row&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Test&lt;/td&gt;&lt;td&gt;2&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+&lt;p&gt;Test ending&lt;/p&gt;
+</code></pre>
+<h1 id="test-with-quote"><a class="header" href="#test-with-quote">Test with quote</a></h1>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">&gt; Test  | Table
+&gt; ------|------
+&gt; Row 1 | Every
+&gt; Row 2 | Day
+&gt;
+&gt; Paragraph
+</code></pre>
+<pre><code class="language-html">&lt;blockquote&gt;
+&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Test&lt;/th&gt;&lt;th&gt;Table&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;Row 1&lt;/td&gt;&lt;td&gt;Every&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Row 2&lt;/td&gt;&lt;td&gt;Day&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+&lt;p&gt;Paragraph&lt;/p&gt;
+&lt;/blockquote&gt;
+</code></pre>
+</div>
+<h1 id="test-with-list"><a class="header" href="#test-with-list">Test with list</a></h1>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown"> 1. First entry
+ 2. Second entry
+
+    Col 1|Col 2
+    -|-
+    Row 1|Part 2
+    Row 2|Part 2
+</code></pre>
+<pre><code class="language-html">&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;First entry&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Second entry&lt;/p&gt;
+&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Col 1&lt;/th&gt;&lt;th&gt;Col 2&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;Row 1&lt;/td&gt;&lt;td&gt;Part 2&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Row 2&lt;/td&gt;&lt;td&gt;Part 2&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+</code></pre>
+</div>
+<h1 id="test-with-border"><a class="header" href="#test-with-border">Test with border</a></h1>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">|Col 1|Col 2|
+|-----|-----|
+|R1C1 |R1C2 |
+|R2C1 |R2C2 |
+</code></pre>
+<pre><code class="language-html">&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Col 1&lt;/th&gt;&lt;th&gt;Col 2&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;R1C1&lt;/td&gt;&lt;td&gt;R1C2&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;R2C1&lt;/td&gt;&lt;td&gt;R2C2&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+</code></pre>
+</div>
+<h1 id="test-with-empty-cells"><a class="header" href="#test-with-empty-cells">Test with empty cells</a></h1>
+<p>Empty cells should work.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">| Col 1 | Col 2 |
+|-------|-------|
+|       |       |
+|       |       |
+</code></pre>
+<pre><code class="language-html">&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Col 1&lt;/th&gt;&lt;th&gt;Col 2&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+</code></pre>
+</div>
+<p>... and properly mix with filled cells.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">| Col 1 | Col 2 |
+|-------|-------|
+|   x   |       |
+|       |    x  |
+</code></pre>
+<pre><code class="language-html">&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Col 1&lt;/th&gt;&lt;th&gt;Col 2&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;x&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;x&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+</code></pre>
+</div>
+<h1 id="table-with-utf-8"><a class="header" href="#table-with-utf-8">Table with UTF-8</a></h1>
+<p>Basic example.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">|Col 1|Col 2|
+|-----|-----|
+|✓    |✓    |
+|✓    |✓    |
+</code></pre>
+<pre><code class="language-html">&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Col 1&lt;/th&gt;&lt;th&gt;Col 2&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;✓&lt;/td&gt;&lt;td&gt;✓&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;✓&lt;/td&gt;&lt;td&gt;✓&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+</code></pre>
+</div>
+<p>More advanced example.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">|  Target                       | std |rustc|cargo| notes                      |
+|-------------------------------|-----|-----|-----|----------------------------|
+| `x86_64-unknown-linux-musl`   |  ✓  |     |     | 64-bit Linux with MUSL     |
+| `arm-linux-androideabi`       |  ✓  |     |     | ARM Android                |
+| `arm-unknown-linux-gnueabi`   |  ✓  |  ✓  |     | ARM Linux (2.6.18+)        |
+| `arm-unknown-linux-gnueabihf` |  ✓  |  ✓  |     | ARM Linux (2.6.18+)        |
+| `aarch64-unknown-linux-gnu`   |  ✓  |     |     | ARM64 Linux (2.6.18+)      |
+| `mips-unknown-linux-gnu`      |  ✓  |     |     | MIPS Linux (2.6.18+)       |
+| `mipsel-unknown-linux-gnu`    |  ✓  |     |     | MIPS (LE) Linux (2.6.18+)  |
+</code></pre>
+<pre><code class="language-html">&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Target&lt;/th&gt;&lt;th&gt;std&lt;/th&gt;&lt;th&gt;rustc&lt;/th&gt;&lt;th&gt;cargo&lt;/th&gt;&lt;th&gt;notes&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;&lt;code&gt;x86_64-unknown-linux-musl&lt;/code&gt;&lt;/td&gt;&lt;td&gt;✓&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;64-bit Linux with MUSL&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;code&gt;arm-linux-androideabi&lt;/code&gt;&lt;/td&gt;&lt;td&gt;✓&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;ARM Android&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;code&gt;arm-unknown-linux-gnueabi&lt;/code&gt;&lt;/td&gt;&lt;td&gt;✓&lt;/td&gt;&lt;td&gt;✓&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;ARM Linux (2.6.18+)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;code&gt;arm-unknown-linux-gnueabihf&lt;/code&gt;&lt;/td&gt;&lt;td&gt;✓&lt;/td&gt;&lt;td&gt;✓&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;ARM Linux (2.6.18+)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;code&gt;aarch64-unknown-linux-gnu&lt;/code&gt;&lt;/td&gt;&lt;td&gt;✓&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;ARM64 Linux (2.6.18+)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;code&gt;mips-unknown-linux-gnu&lt;/code&gt;&lt;/td&gt;&lt;td&gt;✓&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;MIPS Linux (2.6.18+)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;code&gt;mipsel-unknown-linux-gnu&lt;/code&gt;&lt;/td&gt;&lt;td&gt;✓&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;MIPS (LE) Linux (2.6.18+)&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+</code></pre>
+</div>
+<p>Hiragana-containing pseudo-table.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">|-|-|
+|ぃ|い|
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;|-|-|
+|ぃ|い|&lt;/p&gt;
+</code></pre>
+</div>
+<p>Hiragana-containing actual table.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">|ぁ|ぃ|
+|-|-|
+|ぃ|ぃ|
+</code></pre>
+<pre><code class="language-html">&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;ぁ&lt;/th&gt;&lt;th&gt;ぃ&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;ぃ&lt;/td&gt;&lt;td&gt;ぃ&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+</code></pre>
+</div>
+<p>Test russian symbols.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">|Колонка 1|Колонка 2|
+|---------|---------|
+|Ячейка 1 |Ячейка 2 |
+</code></pre>
+<pre><code class="language-html">&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Колонка 1&lt;/th&gt;&lt;th&gt;Колонка 2&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;Ячейка 1&lt;/td&gt;&lt;td&gt;Ячейка 2&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+</code></pre>
+</div>
+<p>Test cases based on <a href="https://github.com/github/cmark-gfm/issues/180">https://github.com/github/cmark-gfm/issues/180</a>
+and <a href="https://github.com/raphlinus/pulldown-cmark/issues/540">https://github.com/raphlinus/pulldown-cmark/issues/540</a>.</p>
+<p>Pulldown-cmark gives "heavy" tables (with a leading <code>|</code>) higher priority than
+"light" tables for paragraph interruption. This is compatible with <em>older</em>
+versions of GitHub, but 2023-06-21 GitHub treats them the same.</p>
+<p>A quick run through <a href="https://babelmark.github.io">https://babelmark.github.io</a> shows, of the
+implementations that support pipe tables at all<sup class="footnote-reference"><a href="#1">1</a></sup>:</p>
+<div class="table-wrapper"><table><thead><tr><th>Implementation     -&gt;</th><th>a</th><th>b</th><th>c</th><th>d</th><th>e</th><th>f</th><th>g</th><th>h</th><th>i</th><th>j</th></tr></thead><tbody>
+<tr><td><strong>pulldown-cmark</strong></td><td>✓</td><td>x</td><td>x</td><td>x</td><td>x</td><td>✓</td><td>x</td><td>x</td><td>✓</td><td>x</td></tr>
+<tr><td>github/cmark-gfm</td><td>✓</td><td>x</td><td>✓</td><td>x</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>x</td></tr>
+<tr><td>pycmarkgfm</td><td>✓</td><td>x</td><td>✓</td><td>x</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>x</td></tr>
+<tr><td>DFM<sup class="footnote-reference"><a href="#2">2</a></sup></td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>-</td><td>-</td><td>x</td></tr>
+<tr><td>league/commonmark GFM</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>x</td><td>✓</td><td>x</td></tr>
+<tr><td>s9e/TextFormatter</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>x</td><td>x</td><td>x</td></tr>
+<tr><td>markdown-it[^3]<sup class="footnote-reference"><a href="#4">3</a></sup></td><td>✓</td><td>x</td><td>✓</td><td>x</td><td>✓</td><td>✓</td><td>✓</td><td>x</td><td>-</td><td>-</td></tr>
+<tr><td>php-markdown-extra</td><td>✓</td><td>x</td><td>✓</td><td>x</td><td>✓</td><td>✓</td><td>✓</td><td>x</td><td>x</td><td>x</td></tr>
+<tr><td>markdig</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td></tr>
+<tr><td>MD4C</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td></tr>
+<tr><td>parsedown</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td></tr>
+<tr><td>maruku<sup class="footnote-reference"><a href="#3">4</a></sup></td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>-</td></tr>
+<tr><td>cebe</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td></tr>
+<tr><td>pandoc</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td></tr>
+<tr><td>multimarkdown</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td><td>x</td></tr>
+</tbody></table>
+</div>
+<p>While pulldown-cmark could probably afford to align itself with GFM, tables
+interrupting paragraphs is not a portable feature, and anyone trying to write
+widely-compatible markdown syntax can't rely on it.</p>
+<div class="footnote-definition" id="1"><sup class="footnote-definition-label">1</sup>
+<p>Implementations that "support pipe tables at all" were identified by
+including "table a" without a preceding paragraph and seeing if it
+produced an HTML table for <em>that</em>.</p>
+</div>
+<div class="footnote-definition" id="2"><sup class="footnote-definition-label">2</sup>
+<p>On "table h" and "table i", DFM sees a table with no cells, followed
+by a paragraph with <code>b</code> in it.</p>
+</div>
+<div class="footnote-definition" id="3"><sup class="footnote-definition-label">4</sup>
+<p>On "table j", maruku and markdown-it see a table with no cells, followed
+by a paragraph with <code>b</code> in it.</p>
+</div>
+<div class="footnote-definition" id="4"><sup class="footnote-definition-label">3</sup>
+<p>On "table i", markdown-it sees a table with no cells, followed
+by a paragraph with <code>b</code> in it.</p>
+</div>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">table a
+|  a  |  b  |
+| --- | --- |
+|  c  |  d  |
+
+
+table b
+    |  a  |  b  |
+    | --- | --- |
+    |  c  |  d  |
+
+
+table c
+ a  |  b
+--- | ---
+ c  |  d
+
+
+table d
+    a | b
+    --|--
+    c | d
+
+
+table e
+a | b
+--|--
+c | d
+
+table f
+  |  a  |  b  |
+  | --- | --- |
+  |  c  |  d  |
+
+
+table g
+   a  |  b
+  --- | ---
+   c  |  d
+
+table h
+a
+|-|
+b
+
+table i
+| a
+|-
+b
+
+table j
+| a
+-
+b
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;table a&lt;/p&gt;
+&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;a&lt;/th&gt;&lt;th&gt;b&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;c&lt;/td&gt;&lt;td&gt;d&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+&lt;p&gt;table b
+|  a  |  b  |
+| --- | --- |
+|  c  |  d  |&lt;/p&gt;
+&lt;p&gt;table c
+a  |  b
+--- | ---
+c  |  d&lt;/p&gt;
+&lt;p&gt;table d
+a | b
+--|--
+c | d&lt;/p&gt;
+&lt;p&gt;table e
+a | b
+--|--
+c | d&lt;/p&gt;
+&lt;p&gt;table f&lt;/p&gt;
+&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;a&lt;/th&gt;&lt;th&gt;b&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;c&lt;/td&gt;&lt;td&gt;d&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+&lt;p&gt;table g
+a  |  b
+--- | ---
+c  |  d&lt;/p&gt;
+&lt;p&gt;table h
+a
+|-|
+b&lt;/p&gt;
+&lt;p&gt;table i&lt;/p&gt;
+&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;a&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;b&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+&lt;h2&gt;table j
+| a&lt;/h2&gt;
+&lt;p&gt;b&lt;/p&gt;
+</code></pre>
+</div>
+<p>Test case based on <a href="https://github.com/github/cmark-gfm/issues/333">https://github.com/github/cmark-gfm/issues/333</a>.
+Normally, we'd follow GFM's lead, but this one seems like a bug,
+and Pandoc, the other big, authoritative Extended Markdown parser,
+treats it as a table.</p>
+<p>Like the example above showing interruption, this ambiguity is tested:</p>
+<div class="table-wrapper"><table><thead><tr><th>Implementation     -&gt;</th><th>parsed as</th></tr></thead><tbody>
+<tr><td><strong>pulldown-cmark</strong></td><td>table</td></tr>
+<tr><td>github/cmark-gfm</td><td>list</td></tr>
+<tr><td>pycmarkgfm</td><td>list</td></tr>
+<tr><td>markdown-it</td><td>table</td></tr>
+<tr><td>php-markdown-extra</td><td>table</td></tr>
+<tr><td>DFM</td><td>table</td></tr>
+<tr><td>league/commonmark GFM</td><td>list</td></tr>
+<tr><td>s9e/TextFormatter</td><td>table</td></tr>
+<tr><td>markdig</td><td>table</td></tr>
+<tr><td>MD4C</td><td>list</td></tr>
+<tr><td>parsedown</td><td>table</td></tr>
+<tr><td>maruku</td><td>table</td></tr>
+<tr><td>cebe</td><td>table</td></tr>
+<tr><td>pandoc</td><td>table</td></tr>
+<tr><td>multimarkdown</td><td>table</td></tr>
+</tbody></table>
+</div><div class=pulldown-cmark-example>
+<pre><code class="language-markdown">a | b
+- | -
+1 | 2
+</code></pre>
+<pre><code class="language-html">&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;a&lt;/th&gt;&lt;th&gt;b&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;1&lt;/td&gt;&lt;td&gt;2&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+</code></pre>
+</div>
+<p>Hard line breaks are not allowed at the end of table header lines.
+It's about a 50:50 split on babelmark, but this change makes pulldown-cmark
+consistent with GFM and Pandoc.</p>
+<div class="table-wrapper"><table><thead><tr><th>Implementation     -&gt;</th><th>parsed as</th></tr></thead><tbody>
+<tr><td><strong>pulldown-cmark</strong></td><td>paragraph</td></tr>
+<tr><td>github/cmark-gfm</td><td>paragraph</td></tr>
+<tr><td>pycmarkgfm</td><td>paragraph</td></tr>
+<tr><td>markdown-it</td><td>table</td></tr>
+<tr><td>php-markdown-extra</td><td>table</td></tr>
+<tr><td>DFM</td><td>table</td></tr>
+<tr><td>league/commonmark GFM</td><td>paragraph</td></tr>
+<tr><td>s9e/TextFormatter</td><td>table</td></tr>
+<tr><td>markdig</td><td>paragraph</td></tr>
+<tr><td>MD4C</td><td>paragraph</td></tr>
+<tr><td>parsedown</td><td>table</td></tr>
+<tr><td>maruku</td><td>table</td></tr>
+<tr><td>cebe</td><td>paragraph</td></tr>
+<tr><td>pandoc</td><td>paragraph</td></tr>
+<tr><td>multimarkdown</td><td>table</td></tr>
+</tbody></table>
+</div><div class=pulldown-cmark-example>
+<pre><code class="language-markdown">a | b\
+- | -
+1 | 2
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;a | b\&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;| -
+1 | 2&lt;/li&gt;
+&lt;/ul&gt;
+</code></pre>
+</div>
+<p>As a block structure, table parsing has a higher priority than backslashes.
+This is consistent with how other paragraph-interrupting structures work,
+and is what GitHub does.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">a\
+| b | c |
+|---|---|
+| d | e |
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;a\&lt;/p&gt;
+&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;b&lt;/th&gt;&lt;th&gt;c&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;d&lt;/td&gt;&lt;td&gt;e&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+</code></pre>
+</div>
+<p>As a special case, pipes in inline code in tables are escaped
+with backslashes.</p>
+<p>The parsing rule for CommonMark is that block structures are parsed before
+inline structures are. Normally, this means backslashes aren't allowed to have
+any effect on block structures at all. Tables do consider backslashes, but
+not the same way inline syntax does: they have higher precedence than anything
+else, as-if they were parsed in a completely separate pass.</p>
+<p>This rule should be identical to GitHub's. See
+<a href="https://gist.github.com/notriddle/c027512ee849f12098fec3a3256c89d3">https://gist.github.com/notriddle/c027512ee849f12098fec3a3256c89d3</a>
+for what they do. This is totally different from Pandoc's <code>commonmark_x</code>,
+for example, and from many other Markdown parsers, because of some weird
+corner cases it creates.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">| Description | Test case |
+|-------------|-----------|
+| Single      | `\`       |
+| Double      | `\\`      |
+| Basic test  | `\|`      |
+| Basic test 2| `\|\|\`   |
+| Basic test 3| `x\|y\|z\`|
+| Not pipe    | `\.`      |
+| Combo       | `\.\|\`   |
+| Extra       | `\\\.`    |
+| Wait, what? | `\\|`     |
+| Wait, what? | `\\\|`    |
+| Wait, what? | `\\\\|`   |
+| Wait, what? | `\\\\\|`  |
+| Wait, what? |          \|
+| Wait, what? |         \\|
+| Wait, what? |        \\\|
+| Wait, what?x|          \|x
+| Wait, what?x|         \\|x
+| Wait, what?x|        \\\|x
+| Direct trail|         \.|x
+</code></pre>
+<pre><code class="language-html">&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Description&lt;/th&gt;&lt;th&gt;Test case&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;Single&lt;/td&gt;&lt;td&gt;&lt;code&gt;\&lt;/code&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Double&lt;/td&gt;&lt;td&gt;&lt;code&gt;\\&lt;/code&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Basic test&lt;/td&gt;&lt;td&gt;&lt;code&gt;|&lt;/code&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Basic test 2&lt;/td&gt;&lt;td&gt;&lt;code&gt;||\&lt;/code&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Basic test 3&lt;/td&gt;&lt;td&gt;&lt;code&gt;x|y|z\&lt;/code&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Not pipe&lt;/td&gt;&lt;td&gt;&lt;code&gt;\.&lt;/code&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Combo&lt;/td&gt;&lt;td&gt;&lt;code&gt;\.|\&lt;/code&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Extra&lt;/td&gt;&lt;td&gt;&lt;code&gt;\\\.&lt;/code&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Wait, what?&lt;/td&gt;&lt;td&gt;&lt;code&gt;\|&lt;/code&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Wait, what?&lt;/td&gt;&lt;td&gt;&lt;code&gt;\\|&lt;/code&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Wait, what?&lt;/td&gt;&lt;td&gt;&lt;code&gt;\\\|&lt;/code&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Wait, what?&lt;/td&gt;&lt;td&gt;&lt;code&gt;\\\\|&lt;/code&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Wait, what?&lt;/td&gt;&lt;td&gt;|&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Wait, what?&lt;/td&gt;&lt;td&gt;|&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Wait, what?&lt;/td&gt;&lt;td&gt;\|&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Wait, what?x&lt;/td&gt;&lt;td&gt;|x&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Wait, what?x&lt;/td&gt;&lt;td&gt;|x&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Wait, what?x&lt;/td&gt;&lt;td&gt;\|x&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Direct trail&lt;/td&gt;&lt;td&gt;.&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+</code></pre>
+</div>
+<p>Example with code blocks in the table's header.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">| Single | `\|` |
+|--|--|
+| Single | `\|` |
+
+
+| Double | `\\|` |
+|--|--|
+| Double | `\\|` |
+
+
+| Double Twice | `\\|\\|` |
+|--|--|
+| Double Twice | `\\|\\|` |
+
+
+| Triple | `\\\|` |
+|--|--|
+| Triple | `\\\|` |
+</code></pre>
+<pre><code class="language-html">&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Single&lt;/th&gt;&lt;th&gt;&lt;code&gt;|&lt;/code&gt;&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;Single&lt;/td&gt;&lt;td&gt;&lt;code&gt;|&lt;/code&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Double&lt;/th&gt;&lt;th&gt;&lt;code&gt;\|&lt;/code&gt;&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;Double&lt;/td&gt;&lt;td&gt;&lt;code&gt;\|&lt;/code&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Double Twice&lt;/th&gt;&lt;th&gt;&lt;code&gt;\|\|&lt;/code&gt;&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;Double Twice&lt;/td&gt;&lt;td&gt;&lt;code&gt;\|\|&lt;/code&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Triple&lt;/th&gt;&lt;th&gt;&lt;code&gt;\\|&lt;/code&gt;&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;Triple&lt;/td&gt;&lt;td&gt;&lt;code&gt;\\|&lt;/code&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+</code></pre>
+</div>
+<p>Table rows must have at least one cell.
+A single pipe, on its own, doesn't count.</p>
+<p>The behavior on babelmark is pretty diverse,
+but this behavior is chosen to align with GFM.</p>
+<p>✓ means it treats the zero cell lines with only a pipe as not being valid
+rows, but otherwise parses as a table.</p>
+<p>x means it treats the zero cell lines with only a pipe as a valid row.</p>
+<p>? means it does something else.</p>
+<div class="table-wrapper"><table><thead><tr><th>Implementation     -&gt;</th><th>first</th><th>second</th><th>third</th></tr></thead><tbody>
+<tr><td><strong>pulldown-cmark</strong></td><td>✓</td><td>✓</td><td>✓</td></tr>
+<tr><td>github/cmark-gfm</td><td>✓</td><td>✓</td><td>✓</td></tr>
+<tr><td>pycmarkgfm</td><td>✓</td><td>✓</td><td>✓</td></tr>
+<tr><td>pandoc gfm<sup class="footnote-reference"><a href="#4">3</a></sup></td><td>✓</td><td>✓</td><td>✓</td></tr>
+<tr><td>parsedown</td><td>x</td><td>x</td><td>✓</td></tr>
+<tr><td>php-markdown-extra</td><td>x</td><td>x</td><td>✓</td></tr>
+<tr><td>markdown-it</td><td>x</td><td>x</td><td>✓<sup class="footnote-reference"><a href="#3">4</a></sup></td></tr>
+<tr><td>DFM</td><td>x</td><td>x</td><td>x</td></tr>
+<tr><td>league/commonmark GFM</td><td>x</td><td>x</td><td>x</td></tr>
+<tr><td>s9e/TextFormatter</td><td>x</td><td>x</td><td>x</td></tr>
+<tr><td>MD4C</td><td>x</td><td>x</td><td>x</td></tr>
+<tr><td>cebe</td><td>x</td><td>x</td><td>x</td></tr>
+<tr><td>pandoc</td><td>x</td><td>x</td><td>x</td></tr>
+<tr><td>multimarkdown</td><td>?<sup class="footnote-reference"><a href="#1">1</a></sup></td><td>?<sup class="footnote-reference"><a href="#1">1</a></sup></td><td>?<sup class="footnote-reference"><a href="#1">1</a></sup></td></tr>
+<tr><td>markdig</td><td>?<sup class="footnote-reference"><a href="#1">1</a></sup></td><td>?<sup class="footnote-reference"><a href="#1">1</a></sup></td><td>?<sup class="footnote-reference"><a href="#1">1</a></sup></td></tr>
+<tr><td>maruku</td><td>?<sup class="footnote-reference"><a href="#2">2</a></sup></td><td>?<sup class="footnote-reference"><a href="#2">2</a></sup></td><td>?<sup class="footnote-reference"><a href="#2">2</a></sup></td></tr>
+</tbody></table>
+</div>
+<p><a href="https://babelmark.github.io/?text=No+single-pipe+lines.+This+test+case+is+a+%22null+hypothesis%22+used+to+recognize+table+support.%0A%0A%7C+Table+%7C+Header+%7C%0A%7C-------%7C--------%7C%0A%7C+Table+%7C+Body+++%7C%0A%0AThis+the+first+test+case.%0A%0A%7C+Table+%7C+Header+%7C%0A%7C-------%7C--------%7C%0A%7C+Table+%7C+Body+++%7C%0A%7C%0A%7C+Not+++%7C+Enough+%7C%0A%0AThis+the+second+test+case.%0A%0A%7C+Table+%7C+Header+%7C%0A%7C-------%7C--------%7C%0A%7C%0A%0AThis+the+third+test+case.%0A%0A%7C%0A%7C-------%7C--------%7C%0A%7C+Table+%7C+Body+++%7C%0A">babelmark test cases</a></p>
+<div class="footnote-definition" id="1"><sup class="footnote-definition-label">1</sup>
+<p>Multimarkdown and Markdig don't recognize these at tables at all,
+even though I know they support pipe tables.</p>
+</div>
+<div class="footnote-definition" id="2"><sup class="footnote-definition-label">2</sup>
+<p>Maruku swallows much of the text entirely in these test cases.</p>
+</div>
+<div class="footnote-definition" id="3"><sup class="footnote-definition-label">4</sup>
+<p>Markdown-it changed some time between the version on their playground
+<a href="https://markdown-it.github.io/#md3=%7B%22source%22%3A%22%7C%20Table%20%7C%20Header%20%7C%5Cn%7C-------%7C--------%7C%5Cn%7C%20Table%20%7C%20Body%20%20%20%7C%5Cn%7C%5Cn%7C%20Not%20%20%20%7C%20Enough%20%7C%5Cn%5Cn%7C%20Table%20%7C%20Header%20%7C%5Cn%7C-------%7C--------%7C%5Cn%7C%5Cn%5Cn%7C%5Cn%7C-------%7C--------%7C%5Cn%7C%20Table%20%7C%20Body%20%20%20%7C%5Cn%22%2C%22defaults%22%3A%7B%22html%22%3Afalse%2C%22xhtmlOut%22%3Afalse%2C%22breaks%22%3Afalse%2C%22langPrefix%22%3A%22language-%22%2C%22linkify%22%3Atrue%2C%22typographer%22%3Atrue%2C%22_highlight%22%3Atrue%2C%22_strict%22%3Afalse%2C%22_view%22%3A%22html%22%7D%7D">https://markdown-it.github.io/#md3=%7B%22source%22%3A%22%7C%20Table%20%7C%20Header%20%7C%5Cn%7C-------%7C--------%7C%5Cn%7C%20Table%20%7C%20Body%20%20%20%7C%5Cn%7C%5Cn%7C%20Not%20%20%20%7C%20Enough%20%7C%5Cn%5Cn%7C%20Table%20%7C%20Header%20%7C%5Cn%7C-------%7C--------%7C%5Cn%7C%5Cn%5Cn%7C%5Cn%7C-------%7C--------%7C%5Cn%7C%20Table%20%7C%20Body%20%20%20%7C%5Cn%22%2C%22defaults%22%3A%7B%22html%22%3Afalse%2C%22xhtmlOut%22%3Afalse%2C%22breaks%22%3Afalse%2C%22langPrefix%22%3A%22language-%22%2C%22linkify%22%3Atrue%2C%22typographer%22%3Atrue%2C%22_highlight%22%3Atrue%2C%22_strict%22%3Afalse%2C%22_view%22%3A%22html%22%7D%7D</a> and the version Babelmark 3 uses.</p>
+</div>
+<div class="footnote-definition" id="4"><sup class="footnote-definition-label">3</sup>
+<p>Not on babelmark 3. I ran it on <a href="https://pandoc.org/try/?params=%7B%22text%22%3A%22%7C+Table+%7C+Header+%7C%5Cn%7C-------%7C--------%7C%5Cn%7C+Table+%7C+Body+++%7C%5Cn%7C%5Cn%7C+Not+++%7C+Enough+%7C%5Cn%5Cn%7C+Table+%7C+Header+%7C%5Cn%7C-------%7C--------%7C%5Cn%7C%5Cn%5Cn%7C%5Cn%7C-------%7C--------%7C%5Cn%7C+Table+%7C+Body+++%7C%5Cn%22%2C%22to%22%3A%22html5%22%2C%22from%22%3A%22gfm%22%2C%22standalone%22%3Afalse%2C%22embed-resources%22%3Afalse%2C%22table-of-contents%22%3Afalse%2C%22number-sections%22%3Afalse%2C%22citeproc%22%3Afalse%2C%22html-math-method%22%3A%22plain%22%2C%22wrap%22%3A%22auto%22%2C%22highlight-style%22%3Anull%2C%22files%22%3A%7B%7D%2C%22template%22%3Anull%7D">https://pandoc.org/try/?params=%7B%22text%22%3A%22%7C+Table+%7C+Header+%7C%5Cn%7C-------%7C--------%7C%5Cn%7C+Table+%7C+Body+++%7C%5Cn%7C%5Cn%7C+Not+++%7C+Enough+%7C%5Cn%5Cn%7C+Table+%7C+Header+%7C%5Cn%7C-------%7C--------%7C%5Cn%7C%5Cn%5Cn%7C%5Cn%7C-------%7C--------%7C%5Cn%7C+Table+%7C+Body+++%7C%5Cn%22%2C%22to%22%3A%22html5%22%2C%22from%22%3A%22gfm%22%2C%22standalone%22%3Afalse%2C%22embed-resources%22%3Afalse%2C%22table-of-contents%22%3Afalse%2C%22number-sections%22%3Afalse%2C%22citeproc%22%3Afalse%2C%22html-math-method%22%3A%22plain%22%2C%22wrap%22%3A%22auto%22%2C%22highlight-style%22%3Anull%2C%22files%22%3A%7B%7D%2C%22template%22%3Anull%7D</a></p>
+</div>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">| Table | Header |
+|-------|--------|
+| Table | Body   |
+|
+| Not   | Enough |
+
+
+| Table | Header |
+|-------|--------|
+| Table | Body   |
+|→
+| Not   | Enough |
+</code></pre>
+<pre><code class="language-html">&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Table&lt;/th&gt;&lt;th&gt;Header&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;Table&lt;/td&gt;&lt;td&gt;Body&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+&lt;p&gt;|
+| Not   | Enough |&lt;/p&gt;
+&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Table&lt;/th&gt;&lt;th&gt;Header&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;Table&lt;/td&gt;&lt;td&gt;Body&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+&lt;p&gt;|
+| Not   | Enough |&lt;/p&gt;
+</code></pre>
+</div>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">| Table | Header |
+|-------|--------|
+|
+</code></pre>
+<pre><code class="language-html">&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Table&lt;/th&gt;&lt;th&gt;Header&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+&lt;p&gt;|&lt;/p&gt;
+</code></pre>
+</div>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">|
+|-------|--------|
+| Table | Body   |
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;|
+|-------|--------|
+| Table | Body   |&lt;/p&gt;
+</code></pre>
+</div>
+<p>Double escaping in link URLs</p>
+<p><a href="https://markdown-it.github.io/#md3=%7B%22source%22%3A%22%7C%20Single%20%7C%20%5Btest%5D%28first%5C%5C%7Csecond%29%20%7C%5Cn%7C--%7C--%7C%5Cn%5Cn%7C%20Double%20%7C%20%5Btest%5D%28first%5C%5C%5C%5C%7Csecond%29%20%7C%5Cn%7C--%7C--%7C%5Cn%5Cn%7C%20Triple%20%7C%20%5Btest%5D%28first%5C%5C%5C%5C%5C%5C%7Csecond%29%20%7C%5Cn%7C--%7C--%7C%5Cn%22%2C%22defaults%22%3A%7B%22html%22%3Afalse%2C%22xhtmlOut%22%3Afalse%2C%22breaks%22%3Afalse%2C%22langPrefix%22%3A%22language-%22%2C%22linkify%22%3Atrue%2C%22typographer%22%3Atrue%2C%22_highlight%22%3Atrue%2C%22_strict%22%3Afalse%2C%22_view%22%3A%22src%22%7D%7D">https://markdown-it.github.io/#md3=%7B%22source%22%3A%22%7C%20Single%20%7C%20%5Btest%5D%28first%5C%5C%7Csecond%29%20%7C%5Cn%7C--%7C--%7C%5Cn%5Cn%7C%20Double%20%7C%20%5Btest%5D%28first%5C%5C%5C%5C%7Csecond%29%20%7C%5Cn%7C--%7C--%7C%5Cn%5Cn%7C%20Triple%20%7C%20%5Btest%5D%28first%5C%5C%5C%5C%5C%5C%7Csecond%29%20%7C%5Cn%7C--%7C--%7C%5Cn%22%2C%22defaults%22%3A%7B%22html%22%3Afalse%2C%22xhtmlOut%22%3Afalse%2C%22breaks%22%3Afalse%2C%22langPrefix%22%3A%22language-%22%2C%22linkify%22%3Atrue%2C%22typographer%22%3Atrue%2C%22_highlight%22%3Atrue%2C%22_strict%22%3Afalse%2C%22_view%22%3A%22src%22%7D%7D</a></p>
+<p><a href="https://gist.github.com/notriddle/a789116ccec90d261242f3e5fd3bf0ee">https://gist.github.com/notriddle/a789116ccec90d261242f3e5fd3bf0ee</a></p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">| Single | [test](first\|second) |
+|--|--|
+
+| Double | [test](first\\|second) |
+|--|--|
+
+| Triple | [test](first\\\|second) |
+|--|--|
+</code></pre>
+<pre><code class="language-html">&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Single&lt;/th&gt;&lt;th&gt;&lt;a href="first%7Csecond"&gt;test&lt;/a&gt;&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Double&lt;/th&gt;&lt;th&gt;&lt;a href="first%7Csecond"&gt;test&lt;/a&gt;&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Triple&lt;/th&gt;&lt;th&gt;&lt;a href="first%5C%7Csecond"&gt;test&lt;/a&gt;&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+</code></pre>
+</div>
+<p>Double escaping in link references</p>
+<p><a href="https://gist.github.com/notriddle/02d6dfe2559a1a05fa9308e0bf4a9c39">https://gist.github.com/notriddle/02d6dfe2559a1a05fa9308e0bf4a9c39</a></p>
+<p><a href="https://markdown-it.github.io/#md3=%7B%22source%22%3A%22%7C%20Single%20%7C%20%5Bfirst%5C%5C%7Csecond%5D%20%7C%5Cn%7C--%7C--%7C%5Cn%5Cn%7C%20Double%20%7C%20%5Bfirst%5C%5C%5C%5C%7Csecond%5D%20%7C%5Cn%7C--%7C--%7C%5Cn%5Cn%7C%20Triple%20%7C%20%5Bfirst%5C%5C%5C%5C%5C%5C%7Csecond%5D%20%7C%5Cn%7C--%7C--%7C%5Cn%5Cn%5Bfirst%5C%5C%7Csecond%5D%3A%20https%3A%2F%2Frust-lang.org%5Cn%5Cn%5Bfirst%5C%5C%5C%5C%7Csecond%5D%3A%20https%3A%2F%2Fdocs.rs%22%2C%22defaults%22%3A%7B%22html%22%3Afalse%2C%22xhtmlOut%22%3Afalse%2C%22breaks%22%3Afalse%2C%22langPrefix%22%3A%22language-%22%2C%22linkify%22%3Atrue%2C%22typographer%22%3Atrue%2C%22_highlight%22%3Atrue%2C%22_strict%22%3Afalse%2C%22_view%22%3A%22html%22%7D%7D">https://markdown-it.github.io/#md3=%7B%22source%22%3A%22%7C%20Single%20%7C%20%5Bfirst%5C%5C%7Csecond%5D%20%7C%5Cn%7C--%7C--%7C%5Cn%5Cn%7C%20Double%20%7C%20%5Bfirst%5C%5C%5C%5C%7Csecond%5D%20%7C%5Cn%7C--%7C--%7C%5Cn%5Cn%7C%20Triple%20%7C%20%5Bfirst%5C%5C%5C%5C%5C%5C%7Csecond%5D%20%7C%5Cn%7C--%7C--%7C%5Cn%5Cn%5Bfirst%5C%5C%7Csecond%5D%3A%20https%3A%2F%2Frust-lang.org%5Cn%5Cn%5Bfirst%5C%5C%5C%5C%7Csecond%5D%3A%20https%3A%2F%2Fdocs.rs%22%2C%22defaults%22%3A%7B%22html%22%3Afalse%2C%22xhtmlOut%22%3Afalse%2C%22breaks%22%3Afalse%2C%22langPrefix%22%3A%22language-%22%2C%22linkify%22%3Atrue%2C%22typographer%22%3Atrue%2C%22_highlight%22%3Atrue%2C%22_strict%22%3Afalse%2C%22_view%22%3A%22html%22%7D%7D</a></p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">| Single | [first\|second] |
+|--|--|
+
+| Double | [first\\|second] |
+|--|--|
+
+| Triple | [first\\\|second] |
+|--|--|
+
+[first\|second]: https://rust-lang.org
+
+[first\\|second]: https://docs.rs
+</code></pre>
+<pre><code class="language-html">&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Single&lt;/th&gt;&lt;th&gt;[first|second]&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Double&lt;/th&gt;&lt;th&gt;&lt;a href="https://rust-lang.org"&gt;first|second&lt;/a&gt;&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Triple&lt;/th&gt;&lt;th&gt;&lt;a href="https://docs.rs"&gt;first\|second&lt;/a&gt;&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+</code></pre>
+</div>
+<p>Double escaping in table interruption</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">Q: Knock knock.
+A: Who's there.
+Q: Interrupting cow.
+A: Interrupting —?
+| `Moo\\|ooo` |
+|-------------|
+| `ooo\\|ooo` |
+</code></pre>
+<pre><code class="language-html">&lt;p&gt;Q: Knock knock.
+A: Who's there.
+Q: Interrupting cow.
+A: Interrupting —?&lt;/p&gt;
+&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;&lt;code&gt;Moo\|ooo&lt;/code&gt;&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;&lt;code&gt;ooo\|ooo&lt;/code&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+</code></pre>
+</div>
+<p>Double escaping in image alt text</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">| ![Moo\\|Moo](image.png) |
+|-------------|
+| ![Moo\\\|Moo](image.png) |
+</code></pre>
+<pre><code class="language-html">&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;&lt;img src="image.png" alt="Moo|Moo" /&gt;&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;&lt;img src="image.png" alt="Moo\|Moo" /&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+</code></pre>
+</div>
+<p>Double escaping in link title</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">| [Moo](https://example.org "Example\\|Link") |
+|---------------------------------------------|
+| [Moo](https://example.org "Example\\\|Link") |
+</code></pre>
+<pre><code class="language-html">&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;&lt;a href="https://example.org" title="Example|Link"&gt;Moo&lt;/a&gt;&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;&lt;a href="https://example.org" title="Example\|Link"&gt;Moo&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+</code></pre>
+</div>
+<p>Blank list items and lists that don't start at one can interrupt tables.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">moo | moo
+----|----
+moo | moo
+*
+</code></pre>
+<pre><code class="language-html">&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;moo&lt;/th&gt;&lt;th&gt;moo&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;moo&lt;/td&gt;&lt;td&gt;moo&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</code></pre>
+</div>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">moo | moo
+----|----
+moo | moo
+2.
+</code></pre>
+<pre><code class="language-html">&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;moo&lt;/th&gt;&lt;th&gt;moo&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;moo&lt;/td&gt;&lt;td&gt;moo&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+&lt;ol start="2"&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ol&gt;
+</code></pre>
+</div>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../specs/strikethrough.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../third_party/gfm_strikethrough.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../specs/strikethrough.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../third_party/gfm_strikethrough.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

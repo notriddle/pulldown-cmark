@@ -1,0 +1,837 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>heading attributes - pulldown-cmark guide</title>
+
+
+        <!-- Custom HTML head -->
+        <style>
+            .pulldown-cmark-example {
+                display: flex;
+                gap: 1rem;
+                align-items: stretch;
+            }
+            .pulldown-cmark-example > * {
+                width: 50%;
+            }
+        </style>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">Guide</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../third_party/spec.html"><strong aria-hidden="true">1.</strong> CommonMark specification</a></li><li class="chapter-item expanded "><a href="../third_party/smart_punct.html"><strong aria-hidden="true">2.</strong> CommonMark smart punctuation</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../specs/footnotes.html"><strong aria-hidden="true">3.</strong> footnotes extension</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../specs/old_footnotes.html"><strong aria-hidden="true">3.1.</strong> old footnotes extension</a></li></ol></li><li class="chapter-item expanded "><a href="../specs/heading_attrs.html" class="active"><strong aria-hidden="true">4.</strong> heading attributes</a></li><li class="chapter-item expanded "><a href="../specs/metadata_blocks.html"><strong aria-hidden="true">5.</strong> metadata blocks</a></li><li class="chapter-item expanded "><a href="../specs/strikethrough.html"><strong aria-hidden="true">6.</strong> strikethrough</a></li><li class="chapter-item expanded "><a href="../specs/table.html"><strong aria-hidden="true">7.</strong> table</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../third_party/gfm_strikethrough.html"><strong aria-hidden="true">8.</strong> GitHub strikethrough</a></li><li class="chapter-item expanded "><a href="../third_party/gfm_table.html"><strong aria-hidden="true">9.</strong> GitHub tables</a></li><li class="chapter-item expanded "><a href="../third_party/gfm_tasklist.html"><strong aria-hidden="true">10.</strong> GitHub tasklist</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">pulldown-cmark guide</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <p>Examples and edge cases for attribute blocks for headings.</p>
+<h1 id="basic-usage"><a class="header" href="#basic-usage">Basic usage</a></h1>
+<p>Attribute blocks are attributes wrapped by curly braces (<code>{</code> and <code>}</code>) at the
+end of heading content.</p>
+<p>Strictly speaking, attribute blocks satisfies the conditions below:</p>
+<ul>
+<li>Placed at the end of the heading, with optional following spaces.</li>
+<li>Starts with <code>{</code> and ends with <code>}</code>.</li>
+<li>Does not contain any other <code>{</code> and <code>}</code> except for opening and ending of the block.</li>
+<li>Does not contain any <code>&lt;</code>s (less-than operators), <code>&gt;</code>s (greater-than operators),
+<code>\</code>s (backslashes), or newline characters.</li>
+</ul>
+<p>Attributes are separated by ASCII non-newline whitespaces.
+An ID attribute is specified as <code>#id-fragment-here</code>, and a class attribute is
+specified as <code>.class-here</code>. Custom attributes has not a prefix and can optionally
+have a value (<code>myattr</code>, <code>myattr=myvalue</code>).</p>
+<p>Basic usage with setext headings:</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">with the ID {#myh1}
+===================
+with a class {.myclass}
+------------
+with a custom attribute {myattr=myvalue}
+========================================
+multiple! {.myclass1 myattr #myh3 otherattr=value .myclass2}
+--
+</code></pre>
+<pre><code class="language-html">&lt;h1 id="myh1"&gt;with the ID&lt;/h1&gt;
+&lt;h2 class="myclass"&gt;with a class&lt;/h2&gt;
+&lt;h1 myattr="myvalue"&gt;with a custom attribute&lt;/h1&gt;
+&lt;h2 id="myh3" class="myclass1 myclass2" myattr="" otherattr="value"&gt;multiple!&lt;/h2&gt;
+</code></pre>
+</div>
+<p>Basic usage with ATX headings:</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown"># with the ID {#myh1}
+## with a class {.myclass}
+#### with a custom attribute {myattr=myvalue}
+### multiple! {.myclass1 myattr #myh3 otherattr=value .myclass2}
+</code></pre>
+<pre><code class="language-html">&lt;h1 id="myh1"&gt;with the ID&lt;/h1&gt;
+&lt;h2 class="myclass"&gt;with a class&lt;/h2&gt;
+&lt;h4 myattr="myvalue"&gt;with a custom attribute&lt;/h4&gt;
+&lt;h3 id="myh3" class="myclass1 myclass2" myattr="" otherattr="value"&gt;multiple!&lt;/h3&gt;
+</code></pre>
+</div>
+<p>If an ATX heading has closing <code>#</code>s, the attribute block should be placed after them.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown"># H1 # {#id1}
+## H2 ## with ## multiple ## hashes ## {#id2}
+### with trailing hash # ### {#id3}
+
+#### non-attribute-block {#id4} ####
+</code></pre>
+<pre><code class="language-html">&lt;h1 id="id1"&gt;H1&lt;/h1&gt;
+&lt;h2 id="id2"&gt;H2 ## with ## multiple ## hashes&lt;/h2&gt;
+&lt;h3 id="id3"&gt;with trailing hash #&lt;/h3&gt;
+&lt;h4&gt;non-attribute-block {#id4}&lt;/h4&gt;
+</code></pre>
+</div>
+<p>Trailing ASCII spaces are allowed.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown"># spaces {#myid1}    
+## tabs {#myid2}		
+</code></pre>
+<pre><code class="language-html">&lt;h1 id="myid1"&gt;spaces&lt;/h1&gt;
+&lt;h2 id="myid2"&gt;tabs&lt;/h2&gt;
+</code></pre>
+</div>
+<p>ATX heading cannot have multiple lines.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown"># H1 \
+nextline
+</code></pre>
+<pre><code class="language-html">&lt;h1&gt;H1 \&lt;/h1&gt;
+&lt;p&gt;nextline&lt;/p&gt;
+</code></pre>
+</div>
+<p>Of course, attribute blocks cannot be another line in ATX headings.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown"># H1 \
+{#myid}
+
+## H2 \
+nextline {.class}
+
+### H3 [link
+](https://example.com/) {#myid3}
+</code></pre>
+<pre><code class="language-html">&lt;h1&gt;H1 \&lt;/h1&gt;
+&lt;p&gt;{#myid}&lt;/p&gt;
+&lt;h2&gt;H2 \&lt;/h2&gt;
+&lt;p&gt;nextline {.class}&lt;/p&gt;
+&lt;h3&gt;H3 [link&lt;/h3&gt;
+&lt;p&gt;](https://example.com/) {#myid3}&lt;/p&gt;
+</code></pre>
+</div>
+<!--
+  Note that the `\` at `H1 \</h1>` should be a single backslash, not double.
+  This is due to how `<Spec as Iterator>::next()` in build.rs parses this file.
+  The file is read as a plain string and the tests cases are generated.
+  The lines after a period in examples are not parsed as a markdown.
+-->
+<p>Setext header can have multiple lines.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">H1
+cont
+{#myid}
+==
+</code></pre>
+<pre><code class="language-html">&lt;h1 id="myid"&gt;H1
+cont
+&lt;/h1&gt;
+</code></pre>
+</div>
+<p>However, an attribute block itself cannot have newline characters.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">H1
+{
+  .class1
+  .class2
+}
+==
+</code></pre>
+<pre><code class="language-html">&lt;h1&gt;H1
+{
+.class1
+.class2
+}&lt;/h1&gt;
+</code></pre>
+</div>
+<h2 id="leading-spaces"><a class="header" href="#leading-spaces">Leading spaces</a></h2>
+<p>It is recommended to separate heading content and attribute blocks by spaces.
+Some implementations supports this style, and some others not.</p>
+<p>FYI:
+Attribute blocks without leading spaces are supported by cebe
+(markdown-extra) 1.2.0, markdig (advanced) 0.26.0.0, maruku 0.7.3.beta1, and
+pandoc 2.14.2.
+On the other hand, it is not supported by kramdown 1.2.0 and php-markdown-extra
+1.9.0, while they supports attribute blocks with leading spaces.</p>
+<p>This style is supported since the majority of other implementations seems to
+support this, but be careful about incompatibility.
+Put spaces before attribute blocks for more compatibility.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown"># without space, not recommended{#id1}
+## recommended style with spaces {#id2}
+</code></pre>
+<pre><code class="language-html">&lt;h1 id="id1"&gt;without space, not recommended&lt;/h1&gt;
+&lt;h2 id="id2"&gt;recommended style with spaces&lt;/h2&gt;
+</code></pre>
+</div>
+<h2 id="spaces-inside-braces"><a class="header" href="#spaces-inside-braces">Spaces inside braces</a></h2>
+<p>Braces can be optionally separated by spaces, and contiguous spaces are handled
+in the same way as a single whitespace.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown"># H1 { #id1 }
+## H2 {.myclass      #id2 }
+### H3 {     .myclass}
+</code></pre>
+<pre><code class="language-html">&lt;h1 id="id1"&gt;H1&lt;/h1&gt;
+&lt;h2 id="id2" class="myclass"&gt;H2&lt;/h2&gt;
+&lt;h3 class="myclass"&gt;H3&lt;/h3&gt;
+</code></pre>
+</div>
+<h2 id="separators"><a class="header" href="#separators">Separators</a></h2>
+<p>Separators are mandatory. There are no automagical separation.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown"># H1 {#id1.class1.class2 .class3}
+## H2 {.class1#id2.class2}
+</code></pre>
+<pre><code class="language-html">&lt;h1 id="id1.class1.class2" class="class3"&gt;H1&lt;/h1&gt;
+&lt;h2 class="class1#id2.class2"&gt;H2&lt;/h2&gt;
+</code></pre>
+</div>
+<h2 id="unclosed-braces"><a class="header" href="#unclosed-braces">Unclosed braces</a></h2>
+<p>If a left curly brace is present but is not closed, it is not parsed as an
+attribute blocks.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown"># H1 { #id1
+## H2 {#id2
+</code></pre>
+<pre><code class="language-html">&lt;h1&gt;H1 { #id1&lt;/h1&gt;
+&lt;h2&gt;H2 {#id2&lt;/h2&gt;
+</code></pre>
+</div>
+<p>Not-opened braces are also treated as a usual text content.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown"># H1 #id1 }
+## H2 #id2}
+</code></pre>
+<pre><code class="language-html">&lt;h1&gt;H1 #id1 }&lt;/h1&gt;
+&lt;h2&gt;H2 #id2}&lt;/h2&gt;
+</code></pre>
+</div>
+<h2 id="non-suffix-block"><a class="header" href="#non-suffix-block">Non-suffix block</a></h2>
+<p>Attribute blocks should be at the end of the heading.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown"># H1 { #id1 } foo
+## H2 {#id2} &lt;!-- hello --&gt;
+</code></pre>
+<pre><code class="language-html">&lt;h1&gt;H1 { #id1 } foo&lt;/h1&gt;
+&lt;h2&gt;H2 {#id2} &lt;!-- hello --&gt;&lt;/h2&gt;
+</code></pre>
+</div>
+<h2 id="inlines"><a class="header" href="#inlines">Inlines</a></h2>
+<p>Inlines can be used in headings.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown"># *H1* { #id1 }
+## **H2** {#id2}
+### _H3_ {#id3}
+#### ~~H4~~ {#id4}
+##### [text](uri) {#id5}
+</code></pre>
+<pre><code class="language-html">&lt;h1 id="id1"&gt;&lt;em&gt;H1&lt;/em&gt;&lt;/h1&gt;
+&lt;h2 id="id2"&gt;&lt;strong&gt;H2&lt;/strong&gt;&lt;/h2&gt;
+&lt;h3 id="id3"&gt;&lt;em&gt;H3&lt;/em&gt;&lt;/h3&gt;
+&lt;h4 id="id4"&gt;&lt;del&gt;H4&lt;/del&gt;&lt;/h4&gt;
+&lt;h5 id="id5"&gt;&lt;a href="uri"&gt;text&lt;/a&gt;&lt;/h5&gt;
+</code></pre>
+</div>
+<h1 id="ordering-and-deduplication-of-attributes"><a class="header" href="#ordering-and-deduplication-of-attributes">Ordering and deduplication of attributes</a></h1>
+<p>Attributes are handle in quite simple way.</p>
+<h2 id="id"><a class="header" href="#id">ID</a></h2>
+<p>When a heading have multiple IDs, the last one wins.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown"># H1 {#first #second #last}
+</code></pre>
+<pre><code class="language-html">&lt;h1 id="last"&gt;H1&lt;/h1&gt;
+</code></pre>
+</div>
+<h2 id="classes"><a class="header" href="#classes">Classes</a></h2>
+<p>There are no reordering of classes.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown"># H1 {.z .a .zz}
+</code></pre>
+<pre><code class="language-html">&lt;h1 class="z a zz"&gt;H1&lt;/h1&gt;
+</code></pre>
+</div>
+<p>There are no deduplication of classes.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown"># H1 {.a .a .a}
+</code></pre>
+<pre><code class="language-html">&lt;h1 class="a a a"&gt;H1&lt;/h1&gt;
+</code></pre>
+</div>
+<h2 id="combined"><a class="header" href="#combined">Combined</a></h2>
+<p>When both an ID and classes are specified, ID attribute is always emitted first.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown"># H1 {.myclass #myid}
+## H2 {.z #m .a}
+</code></pre>
+<pre><code class="language-html">&lt;h1 id="myid" class="myclass"&gt;H1&lt;/h1&gt;
+&lt;h2 id="m" class="z a"&gt;H2&lt;/h2&gt;
+</code></pre>
+</div>
+<h1 id="custom-attributes"><a class="header" href="#custom-attributes">Custom attributes</a></h1>
+<p>Custom attributes can optionally have a value. If they don't have a <code>=</code> symbol,
+their value is <code>None</code> and they are written in HTML with an empty value. When
+nothing follows a <code>=</code> symbol, their value is an empty string and they are
+written in HTML with an empty value too. When something follows a <code>=</code> symbol,
+that characters are their value.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown"># H1 {foo}
+## H2 {#myid unknown this#is.ignored attr=value .myclass}
+</code></pre>
+<pre><code class="language-html">&lt;h1 foo=""&gt;H1&lt;/h1&gt;
+&lt;h2 id="myid" class="myclass" unknown="" this#is.ignored="" attr="value"&gt;H2&lt;/h2&gt;
+</code></pre>
+</div>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown"># Header # {myattr=value other_attr}
+</code></pre>
+<pre><code class="language-html">&lt;h1 myattr="value" other_attr=""&gt;Header&lt;/h1&gt;
+</code></pre>
+</div>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">#### Header {#id myattr= .class1 other_attr=false}
+</code></pre>
+<pre><code class="language-html">&lt;h4 id="id" class="class1" myattr="" other_attr="false"&gt;Header&lt;/h4&gt;
+</code></pre>
+</div>
+<h1 id="forbidden-characters"><a class="header" href="#forbidden-characters">Forbidden characters</a></h1>
+<p>Some characters cannot appear in attribute blocks.
+Forbidden characters are:</p>
+<ul>
+<li>left curly brace (<code>{</code>),</li>
+<li>right curly brace (<code>}</code>),</li>
+<li>less-than operator (<code>&lt;</code>),</li>
+<li>greater-than operator (<code>&gt;</code>),</li>
+<li>backslash (<code>\</code>), and</li>
+<li>newline.</li>
+</ul>
+<p>Left curly brace (note that <code>{unknown}</code> and <code>{.bar}</code> are treated as attribute blocks):</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown"># H1 {.foo{unknown}
+## H2 {.foo{.bar}
+</code></pre>
+<pre><code class="language-html">&lt;h1 unknown=""&gt;H1 {.foo&lt;/h1&gt;
+&lt;h2 class="bar"&gt;H2 {.foo&lt;/h2&gt;
+</code></pre>
+</div>
+<p>Right curly brace:</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown"># H1 {.foo}bar}
+</code></pre>
+<pre><code class="language-html">&lt;h1&gt;H1 {.foo}bar}&lt;/h1&gt;
+</code></pre>
+</div>
+<p>less-than operator and greater-than operator:</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown"># H1 {&lt;i&gt;foo&lt;/i&gt;}
+</code></pre>
+<pre><code class="language-html">&lt;h1&gt;H1 {&lt;i&gt;foo&lt;/i&gt;}&lt;/h1&gt;
+</code></pre>
+</div>
+<p>Backslash:</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown"># H1 {.foo\}
+</code></pre>
+<pre><code class="language-html">&lt;h1&gt;H1 {.foo}&lt;/h1&gt;
+</code></pre>
+</div>
+<p>Newline:</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">H1 {.foo
+.bar}
+==
+</code></pre>
+<pre><code class="language-html">&lt;h1&gt;H1 {.foo
+.bar}&lt;/h1&gt;
+</code></pre>
+</div>
+<h1 id="cancelling-parsing-of-attribute-blocks"><a class="header" href="#cancelling-parsing-of-attribute-blocks">Cancelling parsing of attribute blocks</a></h1>
+<p>If you want to avoid the last <code>{...}</code> from being treated as an attribute block,
+you can do it in some ways.</p>
+<p>Put a dummy empty attribute block <code>{}</code> at the end of line:</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">H1 {} {}
+=====
+
+## H2 {} {}
+</code></pre>
+<pre><code class="language-html">&lt;h1&gt;H1 {}&lt;/h1&gt;
+&lt;h2&gt;H2 {}&lt;/h2&gt;
+</code></pre>
+</div>
+<p>Or, put closing hashes for ATX heading:</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">## H2 {} ##
+</code></pre>
+<pre><code class="language-html">&lt;h2&gt;H2 {}&lt;/h2&gt;
+</code></pre>
+</div>
+<p>Or, include forbidden characters (a backslash and newline in this example)
+between the braces.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown"># H1 {\}
+## this is also ok \{\}
+
+newline can be used for setext heading {
+}
+--
+</code></pre>
+<pre><code class="language-html">&lt;h1&gt;H1 {}&lt;/h1&gt;
+&lt;h2&gt;this is also ok {}&lt;/h2&gt;
+&lt;h2&gt;newline can be used for setext heading {
+}&lt;/h2&gt;
+</code></pre>
+</div>
+<p>Note that escaping only opening braces does not prevent the braces from
+starting attribute blocks.
+Forbidden characters between braces are important.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown"># H1 \{.foo}
+## H2 \\{.bar}
+### stray backslash at the end is preserved \
+</code></pre>
+<pre><code class="language-html">&lt;h1 class="foo"&gt;H1 \&lt;/h1&gt;
+&lt;h2 class="bar"&gt;H2 \&lt;/h2&gt;
+&lt;h3&gt;stray backslash at the end is preserved \&lt;/h3&gt;
+</code></pre>
+</div>
+<!--
+  Note that the `\` at `H1-2 \</h1>` should be a single backslash, not double.
+  This is due to how `<Spec as Iterator>::next()` in build.rs parses this file.
+  The file is read as a plain string and the tests cases are generated.
+  The lines after a period in examples are not parsed as a markdown.
+-->
+<!--
+  Note that the `\` at `H1-2 \</h1>` should be a single backslash, not double.
+  This is due to how `<Spec as Iterator>::next()` in build.rs parses this file.
+  The file is read as a plain string and the tests cases are generated.
+  The lines after a period in examples are not parsed as a markdown.
+-->
+<p>You may notice the backslash in <code># H1 \{.foo}</code> is preserved.
+The parser strips the <code>{.foo}</code> attribute block <strong>before processing backslash
+escapes</strong>, so the heading content <code>H1 \</code> is extracted and the stray backslash
+at the end of the heading is preserved as usual.</p>
+<p>Same applies to setext headings with stray trailing backslashes.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">H1 \{.foo}
+==
+H2 \\{.bar}
+--
+
+stray backslash at the end is preserved \
+--
+</code></pre>
+<pre><code class="language-html">&lt;h1 class="foo"&gt;H1 \&lt;/h1&gt;
+&lt;h2 class="bar"&gt;H2 \&lt;/h2&gt;
+&lt;h2&gt;stray backslash at the end is preserved \&lt;/h2&gt;
+</code></pre>
+</div>
+<h1 id="disabled-inlines"><a class="header" href="#disabled-inlines">Disabled inlines</a></h1>
+<p>Inlines are disabled and special characters such as <code>_</code> and <code>*</code> will be treated
+as a plain character inside attribute blocks.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown"># H1 {#`code`}
+## H2 {#foo__bar__baz}
+### H3 {#foo**bar**baz}
+</code></pre>
+<pre><code class="language-html">&lt;h1 id="`code`"&gt;H1&lt;/h1&gt;
+&lt;h2 id="foo__bar__baz"&gt;H2&lt;/h2&gt;
+&lt;h3 id="foo**bar**baz"&gt;H3&lt;/h3&gt;
+</code></pre>
+</div>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">H1 {#`code`}
+==
+
+H2-1 {#foo__bar__baz}
+----
+
+H2-2 {#foo**bar**baz}
+--
+</code></pre>
+<pre><code class="language-html">&lt;h1 id="`code`"&gt;H1&lt;/h1&gt;
+&lt;h2 id="foo__bar__baz"&gt;H2-1&lt;/h2&gt;
+&lt;h2 id="foo**bar**baz"&gt;H2-2&lt;/h2&gt;
+</code></pre>
+</div>
+<p>Parsing of attribute blocks takes precedence, even when unclosed inlines are
+present before the attribute blocks.</p>
+<pre><code class="language-.example"># H1 __{#my__id1}
+## H2 **{#my**id2}
+### H3 `{.code` }
+#### H4 ~~{.strike~~ }
+.
+&lt;h1 id="my__id1"&gt;H1 __&lt;/h1&gt;
+&lt;h2 id="my**id2"&gt;H2 **&lt;/h2&gt;
+&lt;h3 class="code`"&gt;H3 `&lt;/h3&gt;
+&lt;h4 class=".strike~~"&gt;H4 ~~&lt;/h4&gt;
+</code></pre>
+<pre><code class="language-.example"># H1__ {#my__id1}
+## H2** {#my**id2}
+### H3` {.code` }
+#### H4~~ {.strike~~ }
+.
+&lt;h1 id="my__id1"&gt;H1__ &lt;/h1&gt;
+&lt;h2 id="my**id2"&gt;H2** &lt;/h2&gt;
+&lt;h3 class="code`"&gt;H3` &lt;/h3&gt;
+&lt;h4 class=".strike~~"&gt;H4~~ &lt;/h4&gt;
+</code></pre>
+<pre><code class="language-.example"># H1__ {.foo__bar**baz}
+qux**
+.
+&lt;h1 class="foo__bar**baz"&gt;H1__&lt;/h1&gt;
+&lt;p&gt;qux**&lt;/p&gt;
+</code></pre>
+<p>This behavior helps source writers and generators add attribute blocks to
+headings without necessity to know and parse the heading content.</p>
+<h1 id="escapes"><a class="header" href="#escapes">Escapes</a></h1>
+<p>Only double quotes (<code>"</code>) and ampersands (<code>&amp;</code>) are escaped into HTML character
+entity references (<code>&amp;quot;</code> and <code>&amp;amp;</code> respectively), and no more extra escape
+and sanitizing are applied.
+Writers are responsible to write valid (and safe) IDs and classes.</p>
+<p>Note that <code>'</code> won't be escaped since pulldown-cmark always uses double quotes
+to wrap attributes and it is safe to put single quotes inside them.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown"># H1 {.foo#bar}
+## H2 {#foo.bar}
+### H3 {.a"b'c&amp;d}
+</code></pre>
+<pre><code class="language-html">&lt;h1 class="foo#bar"&gt;H1&lt;/h1&gt;
+&lt;h2 id="foo.bar"&gt;H2&lt;/h2&gt;
+&lt;h3 class="a&amp;quot;b&amp;#39;c&amp;amp;d"&gt;H3&lt;/h3&gt;
+</code></pre>
+</div>
+<h1 id="edge-cases"><a class="header" href="#edge-cases">Edge cases</a></h1>
+<p>Markdown processor cannot abort on syntax error, so some output is required for
+any input, even if it is obviously wrong or looks very weird.
+However, attribute blocks is extended syntax with neither de jure nor de facto
+standard, so uncommon cases will lead to possibly unexpected output that is
+incompatible with other implementations.</p>
+<p>Users should not rely on the current behavior on these weird edge case inputs.</p>
+<h2 id="empty-ids-and-classes"><a class="header" href="#empty-ids-and-classes">Empty IDs and classes</a></h2>
+<p>If IDs and classes are specified with empty name, they are simply ignored.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown"># H1 {#}
+## H2 {.}
+</code></pre>
+<pre><code class="language-html">&lt;h1&gt;H1&lt;/h1&gt;
+&lt;h2&gt;H2&lt;/h2&gt;
+</code></pre>
+</div>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown"># H1 {#foo #}
+# H1 {.foo . . .bar}
+</code></pre>
+<pre><code class="language-html">&lt;h1 id="foo"&gt;H1&lt;/h1&gt;
+&lt;h1 class="foo bar"&gt;H1&lt;/h1&gt;
+</code></pre>
+</div>
+<h2 id="empty-headers"><a class="header" href="#empty-headers">Empty headers</a></h2>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown"># {}
+## {}
+### {\}
+#### {} {}
+
+#{}
+</code></pre>
+<pre><code class="language-html">&lt;h1&gt;&lt;/h1&gt;
+&lt;h2&gt;&lt;/h2&gt;
+&lt;h3&gt;{}&lt;/h3&gt;
+&lt;h4&gt;{}&lt;/h4&gt;
+&lt;p&gt;#{}&lt;/p&gt;
+</code></pre>
+</div>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown">{}
+==
+
+\{}
+--
+
+\
+--
+
+{\}
+==
+
+{}{}
+--
+</code></pre>
+<pre><code class="language-html">&lt;h1&gt;&lt;/h1&gt;
+&lt;h2&gt;\&lt;/h2&gt;
+&lt;h2&gt;\&lt;/h2&gt;
+&lt;h1&gt;{}&lt;/h1&gt;
+&lt;h2&gt;{}&lt;/h2&gt;
+</code></pre>
+</div>
+<h2 id="whitespaces"><a class="header" href="#whitespaces">Whitespaces</a></h2>
+<h3 id="trailing-ascii-whitespaces"><a class="header" href="#trailing-ascii-whitespaces">Trailing ASCII whitespaces</a></h3>
+<p>Trailing non-U+0020 spaces in the heading content are preserved, even when an
+attribute block follows.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown"># horizontal tab	
+# horizontal tab	{#ht}
+## form feed
+## form feed{#ff}
+### vertical tab
+### vertical tab{#vt}
+</code></pre>
+<pre><code class="language-html">&lt;h1&gt;horizontal tab	&lt;/h1&gt;
+&lt;h1 id="ht"&gt;horizontal tab	&lt;/h1&gt;
+&lt;h2&gt;form feed&lt;/h2&gt;
+&lt;h2 id="ff"&gt;form feed&lt;/h2&gt;
+&lt;h3&gt;vertical tab&lt;/h3&gt;
+&lt;h3 id="vt"&gt;vertical tab&lt;/h3&gt;
+</code></pre>
+</div>
+<h3 id="attributes-separators"><a class="header" href="#attributes-separators">Attributes separators</a></h3>
+<p>Attributes are separated by ASCII non-newline whitespaces, as described previously.
+More precisely, the three characters below can be used as a separator:</p>
+<ul>
+<li>U+0020 SPACE,</li>
+<li>U+0009 HORIZONTAL TAB, and</li>
+<li>U+000C FORM FEED.</li>
+</ul>
+<p>Note that U+000B VERTICAL TAB is not considered as a non-newline whitespace.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown"># horizontal tab (U+000A) {#ht	.myclass}
+## form feed (U+000C) {#ff.myclass}
+
+# vertical tab (U+000B) {#vt.myclass}
+</code></pre>
+<pre><code class="language-html">&lt;h1 id="ht" class="myclass"&gt;horizontal tab (U+000A)&lt;/h1&gt;
+&lt;h2 id="ff" class="myclass"&gt;form feed (U+000C)&lt;/h2&gt;
+&lt;h1 id="vt.myclass"&gt;vertical tab (U+000B)&lt;/h1&gt;
+</code></pre>
+</div>
+<p>Non-ASCII whitespaces don't work as separators.</p>
+<div class=pulldown-cmark-example>
+<pre><code class="language-markdown"># EN SPACE (U+2002) {#en-space .myclass}
+## IDEOGRAPHIC SPACE (U+3000) {#ideographic-space　.myclass}
+</code></pre>
+<pre><code class="language-html">&lt;h1 id="en-space .myclass"&gt;EN SPACE (U+2002)&lt;/h1&gt;
+&lt;h2 id="ideographic-space　.myclass"&gt;IDEOGRAPHIC SPACE (U+3000)&lt;/h2&gt;
+</code></pre>
+</div>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../specs/old_footnotes.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../specs/metadata_blocks.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../specs/old_footnotes.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../specs/metadata_blocks.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>
