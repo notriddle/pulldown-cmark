@@ -129,17 +129,11 @@ pub(crate) fn scan_link_label_rest<'t>(
     if only_white_space {
         None
     } else {
+        let asciiws = &[' ', '\r', '\n', '\t'][..];
         let cow = if mark == 0 {
-            let asciiws = &[' ', '\r', '\n', '\t'][..];
             text[..ix].trim_matches(asciiws).into()
         } else {
-            label.push_str(&text[mark..ix]);
-            while matches!(label.as_bytes().last(), Some(&b' ' | &b'\r' | &b'\n' | &b'\t')) {
-                label.pop();
-            }
-            while matches!(label.as_bytes().first(), Some(&b' ' | &b'\r' | &b'\n' | &b'\t')) {
-                label.remove(0);
-            }
+            label.push_str(&text[mark..ix].trim_matches(asciiws));
             label.into()
         };
         Some((ix + 1, cow))
